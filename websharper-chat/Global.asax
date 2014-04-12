@@ -1,1 +1,1 @@
-<%@ Application Inherits="websharper_chat.Global" %>
+<%@ Application Inherits="WebsharperChat.Global" %>

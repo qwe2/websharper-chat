@@ -1,4 +1,4 @@
-namespace websharper_chat
+namespace WebsharperChat
 
 open IntelliFactory.WebSharper
 

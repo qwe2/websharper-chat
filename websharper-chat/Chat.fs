@@ -1,40 +1,41 @@
-namespace websharper_chat
+namespace WebsharperChat
 
 open System
 open System.Collections.Generic
 open System.Security
 open System.Text
 open System.Threading
-open System.Threading.Tasks
 open System.Web
 open Microsoft.Web.WebSockets
 open IntelliFactory.WebSharper
 open IntelliFactory.WebSharper.Html
 open IntelliFactory.WebSharper.JQuery
 
-module Chat =
 
+module Chat =
     let mutable clients = new WebSocketCollection()
-    
+
     type WebSocketChatHandler() =
         inherit WebSocketHandler()
 
         override this.OnOpen() = 
             clients.Add(this)
+
+        override this.OnMessage(message: string) =
+            clients.Broadcast(message)
             
-        override this.OnClose() =
+        override this.OnClose() = 
             clients.Remove this |> ignore
 
-    type ChatWebSocket() = 
-        interface IHttpHandler with
-            member this.ProcessRequest context =
-                if context.IsWebSocketRequest then
-                    context.AcceptWebSocketRequest(new WebSocketChatHandler())
-            member x.IsReusable = true
-            
-        member this.HandleWebSocket(context: WebSockets.AspNetWebSocketContext): Task = null
 
-    type User = 
+type ChatWebSocket() = 
+    interface IHttpHandler with
+        member this.ProcessRequest context =
+            if context.IsWebSocketRequest then
+                context.AcceptWebSocketRequest(new Chat.WebSocketChatHandler())
+        member this.IsReusable = true
+
+(*    type User = 
         {
             Name: string
         }
@@ -72,3 +73,5 @@ module Chat =
 
         let Validate (token: Token): bool =
             Generate token.Name = token
+            *)
+            

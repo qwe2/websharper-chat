@@ -1,26 +1,35 @@
-namespace websharper_chat
+namespace WebsharperChat
 
 open IntelliFactory.WebSharper
 open IntelliFactory.WebSharper.Html
+open IntelliFactory.WebSharper.Html5
 
 [<JavaScript>]
 module Client =
 
-    let Start input k =
-        async {
-            let! data = Remoting.Process(input)
-            return k data
-        }
-        |> Async.Start
+    let Render text color =
+        P [Text text; Attr.Style <| "color: " + color]
+
+    let Append data =
+        ById("chatbox").AppendChild((Render data "black").Dom) |> ignore
+
+    let SetEventHandlers (ws: WebSocket) =
+        ws.Onmessage <- (fun(data) -> Append <| data.Data.ToString() )
+        ws.Onerror <- (fun() -> Render "Error" "red" |> ignore)
+        ws
+
+    let Connect href =
+        SetEventHandlers <| WebSocket href
+
+    let SendText (ws: WebSocket) (textbox: Element) =
+        ws.Send textbox.Value
+        textbox.Value <- ""
 
     let Main () =
-        let input = Input [Text ""]
-        let label = Div [Text ""]
-        Div [
-            input
-            label
-            Button [Text "Click"]
-            |>! OnClick (fun _ _ ->
-                Start input.Value (fun out ->
-                    label.Text <- out))
+        let ws = Connect ("ws://" + Window.Self.Location.Host + "/chat")
+        let textbox = Input [ Text ""; Attr.Id "message-box"; Attr.Class "form-control"; Attr.Type "text" ] 
+        textbox |>! OnKeyPress (fun input char -> if char.CharacterCode = 13 then SendText ws textbox) |> ignore
+        Div [ 
+            Div [ Attr.Id "chatbox" ]
+            textbox
         ]

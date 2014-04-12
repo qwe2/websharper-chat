@@ -33,7 +33,7 @@
     <OutputType>Library</OutputType>
     <Name>websharper_chat</Name>
     <RootNamespace>$(Name)</RootNamespace>
-    <AssemblyName>$(Name)</AssemblyName>
+    <AssemblyName>WebsharperChat</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
@@ -58,6 +58,9 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
@@ -110,15 +113,15 @@
     <Error Condition="!Exists('..\packages\WebSharper.2.5.100.31\build\WebSharper.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WebSharper.2.5.100.31\build\WebSharper.targets'))" />
   </Target>
   <ItemGroup>
-    <Compile Include="Chat.fs" />
     <Compile Include="Remoting.fs" />
-    <Compile Include="Client.fs" />
     <Content Include="Main.html" />
     <Content Include="Web.config" />
     <Content Include="Global.asax" />
     <Content Include="Setup.fsx" />
     <None Include="packages.config" />
+    <Compile Include="Client.fs" />
     <Compile Include="Main.fs" />
+    <Compile Include="Chat.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
