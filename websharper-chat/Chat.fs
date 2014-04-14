@@ -1,32 +1,62 @@
 namespace WebsharperChat
 
 open System
-open System.Collections.Generic
+open System.Collections.Concurrent
 open System.Security
 open System.Text
 open System.Threading
 open System.Web
 open Microsoft.Web.WebSockets
+open System.Web.Script.Serialization
 open IntelliFactory.WebSharper
-open IntelliFactory.WebSharper.Html
-open IntelliFactory.WebSharper.JQuery
-
+open IntelliFactory.WebSharper.Sitelets
 
 module Chat =
-    let mutable clients = new WebSocketCollection()
+    [<JavaScript>]
+    type Message =
+        {
+            Username: string
+            Msg:      string
+        }
+
+    type User = 
+        {
+            Name: string
+            Token: string
+        }
+
+    let private serializer = new JavaScriptSerializer()
+
+    type WebSocketContainer() =
+        inherit ConcurrentDictionary<string, User * WebSocketHandler>()
+        
+        member this.Broadcast(usr: User, message: string) =
+            for elem in this do
+                let (_, ws) = elem.Value
+                serializer.Serialize({ Username = usr.Name; Msg = message })
+                |> ws.Send
+
+        member this.Broadcast(token: string, message: string) =
+            match this.TryGetValue(token) with
+                | (true, (u, _)) -> this.Broadcast(u, message)
+                | (false, _) -> ()
+
+    let mutable clients = new WebSocketContainer()
 
     type WebSocketChatHandler() =
         inherit WebSocketHandler()
 
-        override this.OnOpen() = 
-            clients.Add(this)
+        override this.OnOpen() = ()
+//            match UserSession.GetLoggedInUser() with
+//                | None -> ()
+//                | Some token -> System.Diagnostics.Debug.WriteLine(token)
+            
 
         override this.OnMessage(message: string) =
-            clients.Broadcast(message)
-            
-        override this.OnClose() = 
-            clients.Remove this |> ignore
+            ()            
 
+        override this.OnClose() = 
+            ()
 
 type ChatWebSocket() = 
     interface IHttpHandler with
@@ -35,10 +65,7 @@ type ChatWebSocket() =
                 context.AcceptWebSocketRequest(new Chat.WebSocketChatHandler())
         member this.IsReusable = true
 
-(*    type User = 
-        {
-            Name: string
-        }
+(*    
 
     type Message =
         {

@@ -1,8 +1,4 @@
 declare module WebsharperChat {
-    module Chat {
-        interface WebSocketChatHandler {
-        }
-    }
     module Skin {
         interface Page {
             Title: string;
@@ -14,12 +10,18 @@ declare module WebsharperChat {
             get_Body(): __ABBREV.__Html1.IPagelet;
         }
     }
-    module Client {
-        var Render : {
-            (text: string, color: string): __ABBREV.__Html1.Element;
+    module ChatClient {
+        interface Anim {
+            scrollTop: number;
+        }
+        var RenderMsg : {
+            (data: any): __ABBREV.__Html1.Element;
+        };
+        var RenderError : {
+            (msg: string): __ABBREV.__Html1.Element;
         };
         var Append : {
-            (data: string): void;
+            (elem: __ABBREV.__Html1.Element): void;
         };
         var SetEventHandlers : {
             (ws: __ABBREV.__Html5.WebSocket): __ABBREV.__Html5.WebSocket;
@@ -34,11 +36,57 @@ declare module WebsharperChat {
             (): __ABBREV.__Html1.Element;
         };
     }
+    module Chat {
+        interface Message {
+            Username: string;
+            Msg: string;
+        }
+        interface User {
+            Name: string;
+            Token: string;
+        }
+        interface WebSocketChatHandler {
+        }
+    }
+    module Auth {
+        var WarningPanel : {
+            <_M1>(label: string): __ABBREV.__Data.Formlet<_M1>;
+        };
+        var WithLoadingPane : {
+            <_M1, _M2>(a: any, f: {
+                (x: _M1): __ABBREV.__Data.Formlet<_M2>;
+            }): __ABBREV.__Data.Formlet<_M2>;
+        };
+        var LoginForm : {
+            (redirectUrl: string): __ABBREV.__Data.Formlet<void>;
+        };
+    }
+    module SQLConnection {
+        module DbSchema {
+            module ServiceTypes {
+                module SimpleDataContextTypes {
+                    interface WebSharperChat {
+                    }
+                }
+                interface Users {
+                }
+                interface SimpleDataContextTypes {
+                }
+            }
+            interface ServiceTypes {
+            }
+        }
+        interface DbSchema {
+        }
+    }
+    interface LoginControl {
+        get_Body(): __ABBREV.__Html1.IPagelet;
+    }
+    interface ChatWebSocket {
+    }
     interface Action {
     }
     interface Website {
-    }
-    interface ChatWebSocket {
     }
 }
 declare module __ABBREV {
@@ -48,4 +96,5 @@ declare module __ABBREV {
     export import __Web = IntelliFactory.WebSharper.Web;
     export import __Html1 = IntelliFactory.WebSharper.Html;
     export import __Html5 = IntelliFactory.WebSharper.Html5;
+    export import __Data = IntelliFactory.WebSharper.Formlet.Data;
 }

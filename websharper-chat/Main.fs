@@ -5,8 +5,8 @@ open IntelliFactory.WebSharper
 open IntelliFactory.WebSharper.Sitelets
 
 type Action =
-    | Home
-    | About
+    | Loginpage
+    | Chatpage
 
 module Controls =
 
@@ -16,7 +16,7 @@ module Controls =
 
         [<JavaScript>]
         override __.Body =
-            Client.Main() :> _
+            ChatClient.Main() :> _
 
 module Skin =
     open System.Web
@@ -41,22 +41,34 @@ module Skin =
 
 module Site =
 
-    let HomePage =
-        Skin.WithTemplate "Chat" <| fun ctx ->
-            [
-                Div [new Controls.EntryPoint()]
-            ]
+    let ChatPage =
+        match UserSession.GetLoggedInUser() with
+            | None   -> Content.Redirect Action.Loginpage
+            | Some _ -> Skin.WithTemplate "Chat" <| fun ctx ->
+                            [
+                                Div [new Controls.EntryPoint()]
+                            ]
+
+    let LoginPage =
+        //System.Diagnostics.Debug.WriteLine <| UserSession.GetLoggedInUser().Value
+        match UserSession.GetLoggedInUser() with
+            | Some _ -> Content.Redirect Action.Chatpage
+            | None   -> Skin.WithTemplate "Login" <| fun ctx ->
+                            [
+                                Div [new LoginControl(ctx.Link <| Action.Chatpage)]
+                            ]
 
     let Main =
         Sitelet.Sum [
-            Sitelet.Content "/" Home HomePage
+            Sitelet.Content "/" Loginpage LoginPage
+            Sitelet.Content "/chat" Chatpage ChatPage            
         ]
 
 [<Sealed>]
 type Website() =
     interface IWebsite<Action> with
         member this.Sitelet = Site.Main
-        member this.Actions = []
+        member this.Actions = [Loginpage; Chatpage]
 
 type Global() =
     inherit System.Web.HttpApplication()
