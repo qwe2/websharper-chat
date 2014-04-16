@@ -16,18 +16,17 @@ open IntelliFactory.WebSharper.Sitelets
 open System.Web.Security
 open System.Security.Principal
 
-
 module Chat =
+    type User = 
+        {
+            Name: string
+        }
+
     [<JavaScript>]
     type Message =
         | Msg of string * string
         | Error of string
 
-    type User = 
-        {
-            Name: string
-        }
-    
     module private MessageEncoder =
         module J = IntelliFactory.WebSharper.Core.Json
 
@@ -58,7 +57,7 @@ module Chat =
 
     let mutable clients = new WebSocketContainer()
 
-    let LoginUser (token: string) (username: string) (ws: WebSocketHandler option) =
+    let LoginUser (token: string) (username: string) (ws: WebSocketHandler option) = 
         clients.AddOrUpdate(token, ({ Name = username }, ws),
             fun _ usr -> 
                 match usr with
@@ -66,11 +65,16 @@ module Chat =
         |> ignore
 
     let LogoutUser =
-        match UserSession.GetLoggedInUser () with
-            | Some token ->
-                    UserSession.Logout ()
-                    clients.TryRemove token |> ignore
-            | None -> ()                                     
+        try
+            match UserSession.GetLoggedInUser () with
+                | Some token ->
+                        UserSession.Logout ()
+                        clients.TryRemove token |> ignore
+                | None -> ()
+
+        with :? NullReferenceException -> ()
+        
+
 
     let AuthUser(ctx: WebSocketContext) =
         match ctx.CookieCollection.[FormsAuthentication.FormsCookieName] with

@@ -46,16 +46,22 @@ declare module WebsharperChat {
         }
     }
     module ClAuth {
-        var WarningPanel : {
-            <_M1>(label: string): __ABBREV.__Data.Formlet<_M1>;
-        };
-        var WithLoadingPane : {
-            <_M1, _M2>(a: any, f: {
-                (x: _M1): __ABBREV.__Data.Formlet<_M2>;
-            }): __ABBREV.__Data.Formlet<_M2>;
+        var RenderLoginForm : {
+            <_M1, _M2>(x: __ABBREV.__Piglets.Stream<string>, y: __ABBREV.__Piglets.Stream<string>, submit: _M1): __ABBREV.__Html.Element;
         };
         var LoginForm : {
-            (redirectUrl: string): __ABBREV.__Data.Formlet<void>;
+            (redirectUrl: string): __ABBREV.__Html.Element;
+        };
+        var LoginPiglet : {
+            (): __ABBREV.__Piglets.Piglet<boolean, {
+                (x: {
+                    (x: __ABBREV.__Piglets.Stream<string>): {
+                        (x: __ABBREV.__Piglets.Stream<string>): {
+                            (x: __ABBREV.__Piglets.Submitter<boolean>): __ABBREV.__Html.Element;
+                        };
+                    };
+                }): __ABBREV.__Html.Element;
+            }>;
         };
     }
     module SQLConnection {
@@ -92,5 +98,5 @@ declare module __ABBREV {
     export import __Html = IntelliFactory.WebSharper.Html;
     export import __Chat = WebsharperChat.Chat;
     export import __Html5 = IntelliFactory.WebSharper.Html5;
-    export import __Data = IntelliFactory.WebSharper.Formlet.Data;
+    export import __Piglets = IntelliFactory.WebSharper.Piglets;
 }

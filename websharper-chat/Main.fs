@@ -90,7 +90,7 @@ module Site =
 type Website() =
     interface IWebsite<Action> with
         member this.Sitelet = Site.Main
-        member this.Actions = []//[Loginpage; Chatpage]
+        member this.Actions = [Loginpage; Chatpage]
 
 type Global() =
     inherit System.Web.HttpApplication()

@@ -1,6 +1,6 @@
 (function()
 {
- var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebsharperChat,ChatClient,WebSocket,window,WebSharper,Html,Default,List,EventsPervasives,Operators,Strings,JSON,String,Formlet,Controls,Data,Enhance,Formlet1,FormButtonConfiguration,ClAuth,Remoting,Control,FSharpEvent,Concurrency,Formlet2,Base,Result;
+ var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebsharperChat,ChatClient,WebSocket,window,WebSharper,Html,Default,List,EventsPervasives,Operators,Strings,JSON,String,Piglets,Piglet1,ClAuth,Validation,Pervasives,Remoting,Controls,T;
  Runtime.Define(Global,{
   WebsharperChat:{
    ChatClient:{
@@ -74,107 +74,86 @@
    ClAuth:{
     LoginForm:function(redirectUrl)
     {
-     var arg10,formlet,x,uName,arg101,formlet1,x1,pw,loginF,_builder_;
-     arg10=Controls.Input("");
-     formlet=Data.Validator().IsNotEmpty("Enter Username",arg10);
-     x=Enhance.WithTextLabel("Username",formlet);
-     uName=Enhance.WithCssClass("form-control",x);
-     arg101=Controls.Password("");
-     formlet1=Data.Validator().IsNotEmpty("Enter Password",arg101);
-     x1=Enhance.WithTextLabel("Password",formlet1);
-     pw=Enhance.WithCssClass("form-control",x1);
-     loginF=Data.$(Data.$(Formlet1.Return(function(n)
+     return Piglet1.Render(function(x)
      {
-      return function(pw1)
+      return function(y)
       {
-       return[n,pw1];
-      };
-     }),uName),pw);
-     _builder_=Formlet1.Do();
-     return Enhance.WithFormContainer(_builder_.Delay(function()
-     {
-      var inputRecord,Class,submitConf,inputRecord1,Class1;
-      inputRecord=FormButtonConfiguration.get_Default();
-      Class={
-       $:1,
-       $0:"btn btn-primary"
-      };
-      submitConf=Runtime.New(FormButtonConfiguration,{
-       Label:{
-        $:1,
-        $0:"Login"
-       },
-       Style:inputRecord.Style,
-       Class:Class
-      });
-      inputRecord1=FormButtonConfiguration.get_Default();
-      Class1={
-       $:1,
-       $0:"btn btn-default"
-      };
-      return _builder_.Bind(Enhance.WithCustomSubmitAndResetButtons(submitConf,Runtime.New(FormButtonConfiguration,{
-       Label:{
-        $:1,
-        $0:"Reset"
-       },
-       Style:inputRecord1.Style,
-       Class:Class1
-      }),loginF),Runtime.Tupled(function(_arg1)
-      {
-       var f;
-       f=function(loggedIn)
+       return function(submit)
        {
-        if(loggedIn)
-         {
-          window.location=redirectUrl;
-          return Formlet1.Return(null);
-         }
-        else
-         {
-          return ClAuth.WarningPanel("Login failed");
-         }
+        return ClAuth.RenderLoginForm(x,y,submit);
        };
-       return _builder_.ReturnFrom(ClAuth.WithLoadingPane(Remoting.Async("WebsharperChat:0",[_arg1[0],_arg1[1]]),f));
-      }));
-     }));
-    },
-    WarningPanel:function(label)
-    {
-     var _builder_;
-     _builder_=Formlet1.Do();
-     return _builder_.Delay(function()
+      };
+     },Piglet1.Run(function()
      {
-      return _builder_.Bind(Formlet1.OfElement(function()
-      {
-       return Operators.add(Default.Div(List.ofArray([Default.Attr().Class("warningPanel")])),List.ofArray([Default.Text(label)]));
-      }),function()
-      {
-       return _builder_.ReturnFrom(Formlet1.Never());
-      });
-     });
+      window.location=redirectUrl;
+      return redirectUrl;
+     },ClAuth.LoginPiglet()));
     },
-    WithLoadingPane:function(a,f)
+    LoginPiglet:Runtime.Field(function()
     {
-     return Formlet1.Replace(Formlet1.BuildFormlet(function()
+     return Piglet1.WithSubmit(Validation.Is(function(x)
      {
-      var elem,state;
-      elem=Default.Div(List.ofArray([Default.Attr().Class("loadingPane")]));
-      state=FSharpEvent.New();
-      Concurrency.Start(Concurrency.Delay(function()
+      return x;
+     },"Invalid username or password",Pervasives.op_LessMultiplyGreater(Pervasives.op_LessMultiplyGreater(Piglet1.Return(function(x)
+     {
+      return function(y)
       {
-       return Concurrency.Bind(a,function(_arg11)
+       return Remoting.Call("WebsharperChat:0",[x,y]);
+      };
+     }),Validation.Is(function(value)
+     {
+      return Validation.NotEmpty(value);
+     },"Enter Username",Piglet1.Yield(""))),Validation.Is(function(value)
+     {
+      return Validation.NotEmpty(value);
+     },"Enter password",Piglet1.Yield("")))));
+    }),
+    RenderLoginForm:function(x,y,submit)
+    {
+     var uni,pwi,btn,arg10,arg101;
+     uni=Controls.input("text",function(x1)
+     {
+      return x1;
+     },function(x1)
+     {
+      return x1;
+     },x);
+     uni["HtmlProvider@32"].AddClass(uni.Body,"form-control");
+     pwi=Controls.input("text",function(x1)
+     {
+      return x1;
+     },function(x1)
+     {
+      return x1;
+     },y);
+     pwi["HtmlProvider@32"].AddClass(pwi.Body,"form-control");
+     pwi["HtmlProvider@32"].SetAttribute(pwi.Body,"type","password");
+     btn=Controls.Submit(submit);
+     btn["HtmlProvider@32"].AddClass(btn.Body,"btn btn-primary");
+     jQuery(document).keypress(function(e)
+     {
+      if(e.which===13)
        {
-        state.event.Trigger(Runtime.New(Result,{
-         $:0,
-         $0:_arg11
-        }));
-        return Concurrency.Return(null);
-       });
-      }));
-      return[elem,function()
+        e.preventDefault();
+        jQuery(btn.Body).click();
+        return;
+       }
+      else
+       {
+        return null;
+       }
+     });
+     arg10=List.ofArray([Default.Attr().NewAttr("for",uni.get_Id()),Default.Attr().Class("col-sm-2 control-label"),Default.Text("Username")]);
+     arg101=List.ofArray([Default.Attr().NewAttr("for",pwi.get_Id()),Default.Attr().Class("col-sm-2 control-label"),Default.Text("Password")]);
+     return Operators.add(Default.Div(List.ofArray([Default.Attr().Class("form-horizontal container"),Default.Attr().NewAttr("style","margin-top: 2em; width: 50%; min-width: 200px")])),List.ofArray([Operators.add(Default.Div(List.ofArray([Default.Attr().Class("form-group")])),List.ofArray([Default.Tags().NewTag("label",arg10),Operators.add(Default.Div(List.ofArray([Default.Attr().Class("col-sm-10")])),List.ofArray([uni]))])),Operators.add(Default.Div(List.ofArray([Default.Attr().Class("form-group")])),List.ofArray([Default.Tags().NewTag("label",arg101),Operators.add(Default.Div(List.ofArray([Default.Attr().Class("col-sm-10")])),List.ofArray([pwi]))])),Operators.add(Default.Div(List.ofArray([Default.Attr().Class("form-group")])),List.ofArray([Operators.add(Default.Div(List.ofArray([Default.Attr().Class("col-sm-offset-2 col-sm-10")])),List.ofArray([btn]))])),Controls.ShowErrors(submit,function(errors)
+     {
+      return List.map(function(msg)
       {
-      },state.event];
-     }),f);
+       return Operators.add(Default.P(List.ofArray([Default.Attr().NewAttr("style","color: red")])),List.ofArray([Default.Text(msg)]));
+      },errors);
+     },Default.Div(Runtime.New(T,{
+      $:0
+     })))]));
     }
    },
    Controls:{
@@ -210,23 +189,18 @@
   Strings=Runtime.Safe(WebSharper.Strings);
   JSON=Runtime.Safe(Global.JSON);
   String=Runtime.Safe(Global.String);
-  Formlet=Runtime.Safe(WebSharper.Formlet);
-  Controls=Runtime.Safe(Formlet.Controls);
-  Data=Runtime.Safe(Formlet.Data);
-  Enhance=Runtime.Safe(Formlet.Enhance);
-  Formlet1=Runtime.Safe(Formlet.Formlet);
-  FormButtonConfiguration=Runtime.Safe(Enhance.FormButtonConfiguration);
+  Piglets=Runtime.Safe(WebSharper.Piglets);
+  Piglet1=Runtime.Safe(Piglets.Piglet1);
   ClAuth=Runtime.Safe(WebsharperChat.ClAuth);
+  Validation=Runtime.Safe(Piglet1.Validation);
+  Pervasives=Runtime.Safe(Piglets.Pervasives);
   Remoting=Runtime.Safe(WebSharper.Remoting);
-  Control=Runtime.Safe(WebSharper.Control);
-  FSharpEvent=Runtime.Safe(Control.FSharpEvent);
-  Concurrency=Runtime.Safe(WebSharper.Concurrency);
-  Formlet2=Runtime.Safe(Global.IntelliFactory.Formlet);
-  Base=Runtime.Safe(Formlet2.Base);
-  return Result=Runtime.Safe(Base.Result);
+  Controls=Runtime.Safe(Piglets.Controls);
+  return T=Runtime.Safe(List.T);
  });
  Runtime.OnLoad(function()
  {
+  ClAuth.LoginPiglet();
   return;
  });
 }());

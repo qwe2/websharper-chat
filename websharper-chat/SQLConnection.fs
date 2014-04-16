@@ -22,21 +22,23 @@ module SQLConnection =
     let private Users = Db.Users    
 
     let Authenticate (username: string) (password: string) =
-        let hash = Utils.Hash password
-        let usrs = query { 
-            for user in Users do 
-            where (user.Username = username && user.Password = hash)
-            select user
-        }
+        async {
+            let hash = Utils.Hash password
+            let usrs = query { 
+                for user in Users do 
+                where (user.Username = username && user.Password = hash)
+                select user
+            }
 
-        if usrs.Count() = 1 then
-            let token = Auth.GenToken username
-            for usr in usrs do
-                usr.Lasttoken <- token
-            Db.DataContext.SubmitChanges()
-            Some token
-        else
-            None
+            if usrs.Count() = 1 then
+                let token = Auth.GenToken username
+                for usr in usrs do
+                    usr.Lasttoken <- token
+                Db.DataContext.SubmitChanges()
+                return Some token
+            else
+                return None
+        }
                         
     let GetUsernameByToken (token: string): Async<string option> =
         async {
