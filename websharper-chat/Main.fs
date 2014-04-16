@@ -32,7 +32,7 @@ module Skin =
             .With("title", fun x -> x.Title)
             .With("body", fun x -> x.Body)
 
-    let WithTemplate title body : Content<Action> =
+    let WithTemplate title body : Content<Action> =        
         Content.WithTemplate MainTemplate <| fun context ->
             {
                 Title = title
@@ -42,33 +42,39 @@ module Skin =
 module Site =
 
     let ChatPage =
-        match UserSession.GetLoggedInUser() with
-            | None   -> Content.Redirect Action.Loginpage
-            | Some _ -> Skin.WithTemplate "Chat" <| fun ctx ->
-                            [
-                                Div [new Controls.EntryPoint()]
-                            ]
+        Skin.WithTemplate "Chat" <| fun ctx ->
+                                        [
+                                            Div [new Controls.EntryPoint()]
+                                        ] 
 
     let LoginPage =
-        //System.Diagnostics.Debug.WriteLine <| UserSession.GetLoggedInUser().Value
-        match UserSession.GetLoggedInUser() with
-            | Some _ -> Content.Redirect Action.Chatpage
-            | None   -> Skin.WithTemplate "Login" <| fun ctx ->
-                            [
-                                Div [new LoginControl(ctx.Link <| Action.Chatpage)]
-                            ]
+        Skin.WithTemplate "Login"  <| fun ctx ->
+                                        [
+                                            Div [new LoginControl(ctx.Link <| Action.Chatpage)]
+                                        ]
+                            
 
     let Main =
+        let home = Sitelet.Content "/" Loginpage LoginPage
+        let authenticated = 
+            let filter: Sitelet.Filter<Action> =
+                {
+                    VerifyUser = fun _ ->
+                                            true
+                    LoginRedirect = fun _ -> Action.Loginpage
+                }
+            Sitelet.Protect filter <| Sitelet.Content "/chat" Action.Chatpage ChatPage
+
         Sitelet.Sum [
-            Sitelet.Content "/" Loginpage LoginPage
-            Sitelet.Content "/chat" Chatpage ChatPage            
+            home
+            authenticated          
         ]
 
 [<Sealed>]
 type Website() =
     interface IWebsite<Action> with
         member this.Sitelet = Site.Main
-        member this.Actions = [Loginpage; Chatpage]
+        member this.Actions = []//[Loginpage; Chatpage]
 
 type Global() =
     inherit System.Web.HttpApplication()

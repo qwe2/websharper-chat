@@ -116,13 +116,13 @@
     <Compile Include="Utils.fs" />
     <Compile Include="SQLConnection.fs" />
     <Compile Include="Remoting.fs" />
-    <Compile Include="Auth.fs" />
+    <Compile Include="Chat.fs" />
+    <Compile Include="ClAuth.fs" />
     <Content Include="Main.html" />
     <Content Include="Web.config" />
     <Content Include="Global.asax" />
     <Content Include="Setup.fsx" />
     <None Include="packages.config" />
-    <Compile Include="Chat.fs" />
     <Compile Include="Client.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>

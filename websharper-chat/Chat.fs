@@ -6,6 +6,7 @@ open System.Security
 open System.Text
 open System.Threading
 open System.Web
+open System.Net.WebSockets
 open Microsoft.Web.WebSockets
 open System.Web.Script.Serialization
 open IntelliFactory.WebSharper
@@ -22,19 +23,21 @@ module Chat =
     type User = 
         {
             Name: string
-            Token: string
         }
 
     let private serializer = new JavaScriptSerializer()
 
     type WebSocketContainer() =
-        inherit ConcurrentDictionary<string, User * WebSocketHandler>()
+        inherit ConcurrentDictionary<string, User * WebSocketHandler option>()
         
         member this.Broadcast(usr: User, message: string) =
             for elem in this do
-                let (_, ws) = elem.Value
-                serializer.Serialize({ Username = usr.Name; Msg = message })
-                |> ws.Send
+                let (_, wso) = elem.Value
+                match wso with
+                    | Some ws ->
+                        serializer.Serialize({ Username = usr.Name; Msg = message })
+                        |> ws.Send
+                    | None -> ()
 
         member this.Broadcast(token: string, message: string) =
             match this.TryGetValue(token) with
@@ -43,14 +46,36 @@ module Chat =
 
     let mutable clients = new WebSocketContainer()
 
+    let LoginUser (token: string) (username: string) =
+        UserSession.LoginUser token
+        System.Diagnostics.Debug.WriteLine token
+        clients.AddOrUpdate(token, ({ Name = username }, None), Utils.flip Utils.ct) |> ignore
+
+    let LogoutUser =
+        match UserSession.GetLoggedInUser () with
+            | Some token ->
+                    UserSession.Logout ()
+                    clients.TryRemove token |> ignore
+            | None -> ()                                     
+
+    let AuthUser (ctx: WebSocketContext) =
+        let getUser () =
+            match ctx.User with
+            | null ->
+                None
+            | x ->
+                if x.Identity.IsAuthenticated then
+                    x.Identity.Name |> Some
+                else
+                    None
+        getUser ()
+
     type WebSocketChatHandler() =
         inherit WebSocketHandler()
 
         override this.OnOpen() = ()
-//            match UserSession.GetLoggedInUser() with
-//                | None -> ()
-//                | Some token -> System.Diagnostics.Debug.WriteLine(token)
-            
+            (*match AuthUser this.WebSocketContext match
+                | Some token -> *)
 
         override this.OnMessage(message: string) =
             ()            

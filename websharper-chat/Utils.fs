@@ -14,3 +14,4 @@ module Utils =
         hash.ToString()
 
     let ct a _ = a
+    let flip f x y = f y x

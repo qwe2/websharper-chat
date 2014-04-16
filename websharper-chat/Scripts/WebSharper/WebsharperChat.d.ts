@@ -36,19 +36,7 @@ declare module WebsharperChat {
             (): __ABBREV.__Html1.Element;
         };
     }
-    module Chat {
-        interface Message {
-            Username: string;
-            Msg: string;
-        }
-        interface User {
-            Name: string;
-            Token: string;
-        }
-        interface WebSocketChatHandler {
-        }
-    }
-    module Auth {
+    module ClAuth {
         var WarningPanel : {
             <_M1>(label: string): __ABBREV.__Data.Formlet<_M1>;
         };
@@ -60,6 +48,17 @@ declare module WebsharperChat {
         var LoginForm : {
             (redirectUrl: string): __ABBREV.__Data.Formlet<void>;
         };
+    }
+    module Chat {
+        interface Message {
+            Username: string;
+            Msg: string;
+        }
+        interface User {
+            Name: string;
+        }
+        interface WebSocketChatHandler {
+        }
     }
     module SQLConnection {
         module DbSchema {
@@ -79,10 +78,10 @@ declare module WebsharperChat {
         interface DbSchema {
         }
     }
+    interface ChatWebSocket {
+    }
     interface LoginControl {
         get_Body(): __ABBREV.__Html1.IPagelet;
-    }
-    interface ChatWebSocket {
     }
     interface Action {
     }

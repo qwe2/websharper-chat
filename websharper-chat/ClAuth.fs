@@ -13,31 +13,22 @@ open IntelliFactory.WebSharper.Formlet
 open IntelliFactory.WebSharper.Sitelets
 open IntelliFactory.WebSharper.Web
 
-module Auth =
-    type internal Key = class end
-    let private key = typeof<Key>.GUID.ToString()
-
-    let private GenToken (username: string) =
-        sprintf "%s:%s" username key |> Utils.Hash
+module ClAuth =   
 
     [<Inline "window.location=$url">]
     let Redirect (url: string) = ()
 
     [<Rpc>]
     let Login (username: string) (password: string) =
-        match UserSession.GetLoggedInUser() with
-            | Some _ -> async { return true }
-            | None   -> async {
-                        if SQLConnection.Authenticate username password then
-                            System.Diagnostics.Debug.WriteLine username
-                            System.Diagnostics.Debug.WriteLine <| GenToken username
-                            GenToken username
-                            |> UserSession.LoginUser
-                            return true
-                        else
-                            return false
-                        }
-
+        async {
+            match UserSession.GetLoggedInUser() with
+                | Some _ -> return true            
+                | None   -> let! resp = SQLConnection.Authenticate username password
+                            match resp with
+                                |Some token -> Chat.LoginUser token username
+                                               return true
+                                | None -> return false
+        }
   
     [<JavaScript>]
     let WarningPanel label =
@@ -99,5 +90,5 @@ type LoginControl(redirectUrl: string) =
  
     new () = new LoginControl("?")
     [<JavaScript>]
-    override this.Body = Auth.LoginForm redirectUrl :> _    
+    override this.Body = ClAuth.LoginForm redirectUrl :> _    
         

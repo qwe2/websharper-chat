@@ -1,104 +1,8 @@
 (function()
 {
- var Global=this,Runtime=this.IntelliFactory.Runtime,WebSharper,Formlet,Controls,Data,Enhance,Formlet1,FormButtonConfiguration,window,WebsharperChat,Auth,Remoting,Html,Operators,Default,List,Control,FSharpEvent,Concurrency,Formlet2,Base,Result,document,jQuery,ChatClient,WebSocket,EventsPervasives,Strings,JSON,String;
+ var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebsharperChat,ChatClient,WebSocket,window,WebSharper,Html,Default,List,EventsPervasives,Operators,Strings,JSON,String,Formlet,Controls,Data,Enhance,Formlet1,FormButtonConfiguration,ClAuth,Remoting,Control,FSharpEvent,Concurrency,Formlet2,Base,Result;
  Runtime.Define(Global,{
   WebsharperChat:{
-   Auth:{
-    LoginForm:function(redirectUrl)
-    {
-     var arg10,x,uName,arg101,x1,pw,loginF,_builder_;
-     arg10=Controls.Input("");
-     x=Data.Validator().IsNotEmpty("Enter Username",arg10);
-     uName=Enhance.WithTextLabel("Username",x);
-     arg101=Controls.Password("");
-     x1=Data.Validator().IsNotEmpty("Enter Password",arg101);
-     pw=Enhance.WithTextLabel("Password",x1);
-     loginF=Data.$(Data.$(Formlet1.Return(function(n)
-     {
-      return function(pw1)
-      {
-       return[n,pw1];
-      };
-     }),uName),pw);
-     _builder_=Formlet1.Do();
-     return Enhance.WithFormContainer(_builder_.Delay(function()
-     {
-      var inputRecord,submitConf,inputRecord1;
-      inputRecord=FormButtonConfiguration.get_Default();
-      submitConf=Runtime.New(FormButtonConfiguration,{
-       Label:{
-        $:1,
-        $0:"Login"
-       },
-       Style:inputRecord.Style,
-       Class:inputRecord.Class
-      });
-      inputRecord1=FormButtonConfiguration.get_Default();
-      return _builder_.Bind(Enhance.WithCustomSubmitAndResetButtons(submitConf,Runtime.New(FormButtonConfiguration,{
-       Label:{
-        $:1,
-        $0:"Reset"
-       },
-       Style:inputRecord1.Style,
-       Class:inputRecord1.Class
-      }),loginF),Runtime.Tupled(function(_arg1)
-      {
-       var f;
-       f=function(loggedIn)
-       {
-        if(loggedIn)
-         {
-          window.location=redirectUrl;
-          return Formlet1.Return(null);
-         }
-        else
-         {
-          return Auth.WarningPanel("Login failed");
-         }
-       };
-       return _builder_.ReturnFrom(Auth.WithLoadingPane(Remoting.Async("WebsharperChat:0",[_arg1[0],_arg1[1]]),f));
-      }));
-     }));
-    },
-    WarningPanel:function(label)
-    {
-     var _builder_;
-     _builder_=Formlet1.Do();
-     return _builder_.Delay(function()
-     {
-      return _builder_.Bind(Formlet1.OfElement(function()
-      {
-       return Operators.add(Default.Div(List.ofArray([Default.Attr().Class("warningPanel")])),List.ofArray([Default.Text(label)]));
-      }),function()
-      {
-       return _builder_.ReturnFrom(Formlet1.Never());
-      });
-     });
-    },
-    WithLoadingPane:function(a,f)
-    {
-     return Formlet1.Replace(Formlet1.BuildFormlet(function()
-     {
-      var elem,state;
-      elem=Default.Div(List.ofArray([Default.Attr().Class("loadingPane")]));
-      state=FSharpEvent.New();
-      Concurrency.Start(Concurrency.Delay(function()
-      {
-       return Concurrency.Bind(a,function(_arg11)
-       {
-        state.event.Trigger(Runtime.New(Result,{
-         $:0,
-         $0:_arg11
-        }));
-        return Concurrency.Return(null);
-       });
-      }));
-      return[elem,function()
-      {
-      },state.event];
-     }),f);
-    }
-   },
    ChatClient:{
     Append:function(elem)
     {
@@ -159,6 +63,102 @@
      return ws;
     }
    },
+   ClAuth:{
+    LoginForm:function(redirectUrl)
+    {
+     var arg10,x,uName,arg101,x1,pw,loginF,_builder_;
+     arg10=Controls.Input("");
+     x=Data.Validator().IsNotEmpty("Enter Username",arg10);
+     uName=Enhance.WithTextLabel("Username",x);
+     arg101=Controls.Password("");
+     x1=Data.Validator().IsNotEmpty("Enter Password",arg101);
+     pw=Enhance.WithTextLabel("Password",x1);
+     loginF=Data.$(Data.$(Formlet1.Return(function(n)
+     {
+      return function(pw1)
+      {
+       return[n,pw1];
+      };
+     }),uName),pw);
+     _builder_=Formlet1.Do();
+     return Enhance.WithFormContainer(_builder_.Delay(function()
+     {
+      var inputRecord,submitConf,inputRecord1;
+      inputRecord=FormButtonConfiguration.get_Default();
+      submitConf=Runtime.New(FormButtonConfiguration,{
+       Label:{
+        $:1,
+        $0:"Login"
+       },
+       Style:inputRecord.Style,
+       Class:inputRecord.Class
+      });
+      inputRecord1=FormButtonConfiguration.get_Default();
+      return _builder_.Bind(Enhance.WithCustomSubmitAndResetButtons(submitConf,Runtime.New(FormButtonConfiguration,{
+       Label:{
+        $:1,
+        $0:"Reset"
+       },
+       Style:inputRecord1.Style,
+       Class:inputRecord1.Class
+      }),loginF),Runtime.Tupled(function(_arg1)
+      {
+       var f;
+       f=function(loggedIn)
+       {
+        if(loggedIn)
+         {
+          window.location=redirectUrl;
+          return Formlet1.Return(null);
+         }
+        else
+         {
+          return ClAuth.WarningPanel("Login failed");
+         }
+       };
+       return _builder_.ReturnFrom(ClAuth.WithLoadingPane(Remoting.Async("WebsharperChat:0",[_arg1[0],_arg1[1]]),f));
+      }));
+     }));
+    },
+    WarningPanel:function(label)
+    {
+     var _builder_;
+     _builder_=Formlet1.Do();
+     return _builder_.Delay(function()
+     {
+      return _builder_.Bind(Formlet1.OfElement(function()
+      {
+       return Operators.add(Default.Div(List.ofArray([Default.Attr().Class("warningPanel")])),List.ofArray([Default.Text(label)]));
+      }),function()
+      {
+       return _builder_.ReturnFrom(Formlet1.Never());
+      });
+     });
+    },
+    WithLoadingPane:function(a,f)
+    {
+     return Formlet1.Replace(Formlet1.BuildFormlet(function()
+     {
+      var elem,state;
+      elem=Default.Div(List.ofArray([Default.Attr().Class("loadingPane")]));
+      state=FSharpEvent.New();
+      Concurrency.Start(Concurrency.Delay(function()
+      {
+       return Concurrency.Bind(a,function(_arg11)
+       {
+        state.event.Trigger(Runtime.New(Result,{
+         $:0,
+         $0:_arg11
+        }));
+        return Concurrency.Return(null);
+       });
+      }));
+      return[elem,function()
+      {
+      },state.event];
+     }),f);
+    }
+   },
    Controls:{
     EntryPoint:Runtime.Class({
      get_Body:function()
@@ -170,42 +170,42 @@
    LoginControl:Runtime.Class({
     get_Body:function()
     {
-     return Auth.LoginForm(this.redirectUrl);
+     return ClAuth.LoginForm(this.redirectUrl);
     }
    })
   }
  });
  Runtime.OnInit(function()
  {
+  document=Runtime.Safe(Global.document);
+  jQuery=Runtime.Safe(Global.jQuery);
+  WebsharperChat=Runtime.Safe(Global.WebsharperChat);
+  ChatClient=Runtime.Safe(WebsharperChat.ChatClient);
+  WebSocket=Runtime.Safe(Global.WebSocket);
+  window=Runtime.Safe(Global.window);
   WebSharper=Runtime.Safe(Global.IntelliFactory.WebSharper);
+  Html=Runtime.Safe(WebSharper.Html);
+  Default=Runtime.Safe(Html.Default);
+  List=Runtime.Safe(WebSharper.List);
+  EventsPervasives=Runtime.Safe(Html.EventsPervasives);
+  Operators=Runtime.Safe(Html.Operators);
+  Strings=Runtime.Safe(WebSharper.Strings);
+  JSON=Runtime.Safe(Global.JSON);
+  String=Runtime.Safe(Global.String);
   Formlet=Runtime.Safe(WebSharper.Formlet);
   Controls=Runtime.Safe(Formlet.Controls);
   Data=Runtime.Safe(Formlet.Data);
   Enhance=Runtime.Safe(Formlet.Enhance);
   Formlet1=Runtime.Safe(Formlet.Formlet);
   FormButtonConfiguration=Runtime.Safe(Enhance.FormButtonConfiguration);
-  window=Runtime.Safe(Global.window);
-  WebsharperChat=Runtime.Safe(Global.WebsharperChat);
-  Auth=Runtime.Safe(WebsharperChat.Auth);
+  ClAuth=Runtime.Safe(WebsharperChat.ClAuth);
   Remoting=Runtime.Safe(WebSharper.Remoting);
-  Html=Runtime.Safe(WebSharper.Html);
-  Operators=Runtime.Safe(Html.Operators);
-  Default=Runtime.Safe(Html.Default);
-  List=Runtime.Safe(WebSharper.List);
   Control=Runtime.Safe(WebSharper.Control);
   FSharpEvent=Runtime.Safe(Control.FSharpEvent);
   Concurrency=Runtime.Safe(WebSharper.Concurrency);
   Formlet2=Runtime.Safe(Global.IntelliFactory.Formlet);
   Base=Runtime.Safe(Formlet2.Base);
-  Result=Runtime.Safe(Base.Result);
-  document=Runtime.Safe(Global.document);
-  jQuery=Runtime.Safe(Global.jQuery);
-  ChatClient=Runtime.Safe(WebsharperChat.ChatClient);
-  WebSocket=Runtime.Safe(Global.WebSocket);
-  EventsPervasives=Runtime.Safe(Html.EventsPervasives);
-  Strings=Runtime.Safe(WebSharper.Strings);
-  JSON=Runtime.Safe(Global.JSON);
-  return String=Runtime.Safe(Global.String);
+  return Result=Runtime.Safe(Base.Result);
  });
  Runtime.OnLoad(function()
  {
