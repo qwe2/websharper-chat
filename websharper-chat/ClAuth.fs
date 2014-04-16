@@ -20,15 +20,14 @@ module ClAuth =
 
     [<Rpc>]
     let Login (username: string) (password: string) =
-        async {
-            match UserSession.GetLoggedInUser() with
-                | Some _ -> return true            
-                | None   -> let! resp = SQLConnection.Authenticate username password
-                            match resp with
-                                |Some token -> Chat.LoginUser token username
-                                               return true
-                                | None -> return false
-        }
+        let resp = SQLConnection.Authenticate username password             
+        match resp with
+            | Some token -> Chat.LoginUser token username None
+                            UserSession.LoginUser token
+                            true
+            | None -> false
+        |> async.Return
+        
   
     [<JavaScript>]
     let WarningPanel label =
@@ -61,10 +60,12 @@ module ClAuth =
                 Controls.Input ""
                 |> Validator.IsNotEmpty "Enter Username"
                 |> Enhance.WithTextLabel "Username"
+                |> Enhance.WithCssClass "form-control"
             let pw =
                 Controls.Password ""
                 |> Validator.IsNotEmpty "Enter Password"
                 |> Enhance.WithTextLabel "Password"
+                |> Enhance.WithCssClass "form-control"
             let loginF =
                 Formlet.Yield (fun n pw -> (n, pw))
                 <*> uName <*> pw
@@ -73,8 +74,8 @@ module ClAuth =
                 let! (u, p) = 
                     loginF
                     |> Enhance.WithCustomSubmitAndResetButtons
-                        {Enhance.FormButtonConfiguration.Default with Label = Some "Login"}
-                        {Enhance.FormButtonConfiguration.Default with Label = Some "Reset"}
+                        {Enhance.FormButtonConfiguration.Default with Label = Some "Login"; Class = Some "btn btn-primary"}
+                        {Enhance.FormButtonConfiguration.Default with Label = Some "Reset"; Class = Some "btn btn-default"}
                 return!
                     WithLoadingPane (Login u p) <| fun loggedIn ->
                         if loggedIn then

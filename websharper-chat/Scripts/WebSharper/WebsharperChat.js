@@ -36,9 +36,17 @@
     },
     RenderMsg:function(data)
     {
-     var arg10;
-     arg10=List.ofArray([Default.Text(data.Username+": ")]);
-     return Operators.add(Default.P(List.ofArray([Default.Tags().NewTag("strong",arg10)])),List.ofArray([Default.Text(data.Msg),Default.Attr().Class("bg-info")]));
+     var msg,arg10;
+     if(data.$==0)
+      {
+       msg=data.$1;
+       arg10=List.ofArray([Default.Text(data.$0+": ")]);
+       return Operators.add(Default.P(List.ofArray([Default.Tags().NewTag("strong",arg10)])),List.ofArray([Default.Text(msg),Default.Attr().Class("bg-info")]));
+      }
+     else
+      {
+       return Default.P(List.ofArray([Default.Text(data.$0),Default.Attr().Class("bg-danger")]));
+      }
     },
     SendText:function(ws,textbox)
     {
@@ -66,13 +74,15 @@
    ClAuth:{
     LoginForm:function(redirectUrl)
     {
-     var arg10,x,uName,arg101,x1,pw,loginF,_builder_;
+     var arg10,formlet,x,uName,arg101,formlet1,x1,pw,loginF,_builder_;
      arg10=Controls.Input("");
-     x=Data.Validator().IsNotEmpty("Enter Username",arg10);
-     uName=Enhance.WithTextLabel("Username",x);
+     formlet=Data.Validator().IsNotEmpty("Enter Username",arg10);
+     x=Enhance.WithTextLabel("Username",formlet);
+     uName=Enhance.WithCssClass("form-control",x);
      arg101=Controls.Password("");
-     x1=Data.Validator().IsNotEmpty("Enter Password",arg101);
-     pw=Enhance.WithTextLabel("Password",x1);
+     formlet1=Data.Validator().IsNotEmpty("Enter Password",arg101);
+     x1=Enhance.WithTextLabel("Password",formlet1);
+     pw=Enhance.WithCssClass("form-control",x1);
      loginF=Data.$(Data.$(Formlet1.Return(function(n)
      {
       return function(pw1)
@@ -83,24 +93,32 @@
      _builder_=Formlet1.Do();
      return Enhance.WithFormContainer(_builder_.Delay(function()
      {
-      var inputRecord,submitConf,inputRecord1;
+      var inputRecord,Class,submitConf,inputRecord1,Class1;
       inputRecord=FormButtonConfiguration.get_Default();
+      Class={
+       $:1,
+       $0:"btn btn-primary"
+      };
       submitConf=Runtime.New(FormButtonConfiguration,{
        Label:{
         $:1,
         $0:"Login"
        },
        Style:inputRecord.Style,
-       Class:inputRecord.Class
+       Class:Class
       });
       inputRecord1=FormButtonConfiguration.get_Default();
+      Class1={
+       $:1,
+       $0:"btn btn-default"
+      };
       return _builder_.Bind(Enhance.WithCustomSubmitAndResetButtons(submitConf,Runtime.New(FormButtonConfiguration,{
        Label:{
         $:1,
         $0:"Reset"
        },
        Style:inputRecord1.Style,
-       Class:inputRecord1.Class
+       Class:Class1
       }),loginF),Runtime.Tupled(function(_arg1)
       {
        var f;

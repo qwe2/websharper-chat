@@ -2,12 +2,12 @@ declare module WebsharperChat {
     module Skin {
         interface Page {
             Title: string;
-            Body: __ABBREV.__List.T<__ABBREV.__Html.Element<__ABBREV.__Web.Control>>;
+            Body: __ABBREV.__List.T<any>;
         }
     }
     module Controls {
         interface EntryPoint {
-            get_Body(): __ABBREV.__Html1.IPagelet;
+            get_Body(): __ABBREV.__Html.IPagelet;
         }
     }
     module ChatClient {
@@ -15,13 +15,13 @@ declare module WebsharperChat {
             scrollTop: number;
         }
         var RenderMsg : {
-            (data: any): __ABBREV.__Html1.Element;
+            (data: __ABBREV.__Chat.Message): __ABBREV.__Html.Element;
         };
         var RenderError : {
-            (msg: string): __ABBREV.__Html1.Element;
+            (msg: string): __ABBREV.__Html.Element;
         };
         var Append : {
-            (elem: __ABBREV.__Html1.Element): void;
+            (elem: __ABBREV.__Html.Element): void;
         };
         var SetEventHandlers : {
             (ws: __ABBREV.__Html5.WebSocket): __ABBREV.__Html5.WebSocket;
@@ -30,11 +30,20 @@ declare module WebsharperChat {
             (href: string): __ABBREV.__Html5.WebSocket;
         };
         var SendText : {
-            (ws: __ABBREV.__Html5.WebSocket, textbox: __ABBREV.__Html1.Element): void;
+            (ws: __ABBREV.__Html5.WebSocket, textbox: __ABBREV.__Html.Element): void;
         };
         var Main : {
-            (): __ABBREV.__Html1.Element;
+            (): __ABBREV.__Html.Element;
         };
+    }
+    module Chat {
+        interface Message {
+        }
+        interface User {
+            Name: string;
+        }
+        interface WebSocketChatHandler {
+        }
     }
     module ClAuth {
         var WarningPanel : {
@@ -48,17 +57,6 @@ declare module WebsharperChat {
         var LoginForm : {
             (redirectUrl: string): __ABBREV.__Data.Formlet<void>;
         };
-    }
-    module Chat {
-        interface Message {
-            Username: string;
-            Msg: string;
-        }
-        interface User {
-            Name: string;
-        }
-        interface WebSocketChatHandler {
-        }
     }
     module SQLConnection {
         module DbSchema {
@@ -81,7 +79,7 @@ declare module WebsharperChat {
     interface ChatWebSocket {
     }
     interface LoginControl {
-        get_Body(): __ABBREV.__Html1.IPagelet;
+        get_Body(): __ABBREV.__Html.IPagelet;
     }
     interface Action {
     }
@@ -91,9 +89,8 @@ declare module WebsharperChat {
 declare module __ABBREV {
     
     export import __List = IntelliFactory.WebSharper.List;
-    export import __Html = IntelliFactory.Html.Html;
-    export import __Web = IntelliFactory.WebSharper.Web;
-    export import __Html1 = IntelliFactory.WebSharper.Html;
+    export import __Html = IntelliFactory.WebSharper.Html;
+    export import __Chat = WebsharperChat.Chat;
     export import __Html5 = IntelliFactory.WebSharper.Html5;
     export import __Data = IntelliFactory.WebSharper.Formlet.Data;
 }

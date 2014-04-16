@@ -2291,13 +2291,42 @@
      },
      concat:function(ss)
      {
-      return Seq.fold(function(source1)
+      return Enumerable.Of(function()
       {
-       return function(source2)
+       var outerE,next;
+       outerE=Enumerator.Get(ss);
+       next=function(st)
        {
-        return Seq.append(source1,source2);
+        var matchValue;
+        matchValue=st.s;
+        if(Unchecked.Equals(matchValue,null))
+         {
+          if(outerE.MoveNext())
+           {
+            st.s=Enumerator.Get(outerE.get_Current());
+            return next(st);
+           }
+          else
+           {
+            return false;
+           }
+         }
+        else
+         {
+          if(matchValue.MoveNext())
+           {
+            st.c=matchValue.get_Current();
+            return true;
+           }
+          else
+           {
+            st.s=null;
+            return next(st);
+           }
+         }
        };
-      },Seq.empty(),ss);
+       return T.New(null,null,next);
+      });
      },
      countBy:function(f,s)
      {
@@ -3389,12 +3418,12 @@
       else
        {
         matchValue=typeof a;
-        return matchValue==="undefined"?typeof b==="undefined"?0:-1:matchValue==="function"?Operators.FailWith("Cannot compare function values."):matchValue==="boolean"?a<b?-1:1:matchValue==="number"?a<b?-1:1:matchValue==="string"?a<b?-1:1:a===null?-1:b===null?1:"CompareTo"in a?a.CompareTo(b):(a instanceof Array?b instanceof Array:false)?Unchecked.compareArrays(a,b):Unchecked.compareArrays(JavaScript.GetFields(a),JavaScript.GetFields(b));
+        return matchValue==="undefined"?typeof b==="undefined"?0:-1:matchValue==="function"?Operators.FailWith("Cannot compare function values."):matchValue==="boolean"?a<b?-1:1:matchValue==="number"?a<b?-1:1:matchValue==="string"?a<b?-1:1:a===null?-1:b===null?1:"CompareTo"in a?a.CompareTo(b):(a instanceof Array?b instanceof Array:false)?Unchecked.compareArrays(a,b):(a instanceof Date?b instanceof Date:false)?Unchecked.compareDates(a,b):Unchecked.compareArrays(JavaScript.GetFields(a),JavaScript.GetFields(b));
        }
      },
      Equals:function(a,b)
      {
-      return a===b?true:typeof a==="object"?a===null?false:b===null?false:"Equals"in a?a.Equals(b):(a instanceof Array?b instanceof Array:false)?Unchecked.arrayEquals(a,b):Unchecked.arrayEquals(JavaScript.GetFields(a),JavaScript.GetFields(b)):false;
+      return a===b?true:typeof a==="object"?a===null?false:b===null?false:"Equals"in a?a.Equals(b):(a instanceof Array?b instanceof Array:false)?Unchecked.arrayEquals(a,b):(a instanceof Date?b instanceof Date:false)?Unchecked.dateEquals(a,b):Unchecked.arrayEquals(JavaScript.GetFields(a),JavaScript.GetFields(b)):false;
      },
      Hash:function(o)
      {
@@ -3449,6 +3478,14 @@
           return cmp;
          }
        }
+     },
+     compareDates:function(a,b)
+     {
+      return Operators.Compare(a.getTime(),b.getTime());
+     },
+     dateEquals:function(a,b)
+     {
+      return a.getTime()===b.getTime();
      },
      hashArray:function(o)
      {

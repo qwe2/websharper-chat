@@ -17,7 +17,10 @@ module ChatClient =
     type Anim = { scrollTop: int }
 
     let RenderMsg (data: Chat.Message) =
-        P [ Strong [ Text (data.Username + ": ") ] ] -< [ Text data.Msg; Attr.Class "bg-info" ]
+        match data with
+            | Chat.Error msg       -> P [ Text msg; Attr.Class "bg-danger" ]
+            | Chat.Msg (user, msg) -> P [ Strong [ Text (user + ": ") ] ] -< [ Text msg; Attr.Class "bg-info" ]
+        
 
     let RenderError (msg: string) =
         P [ Text msg; Attr.Class "bg-danger" ]

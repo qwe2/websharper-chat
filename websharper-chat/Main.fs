@@ -1,5 +1,6 @@
 namespace WebsharperChat
 
+open System
 open IntelliFactory.Html
 open IntelliFactory.WebSharper
 open IntelliFactory.WebSharper.Sitelets
@@ -55,12 +56,27 @@ module Site =
                             
 
     let Main =
-        let home = Sitelet.Content "/" Loginpage LoginPage
+        let basehome = Sitelet.Content "/" Loginpage LoginPage
+
+        let home =
+            {
+                Router = basehome.Router
+                Controller =
+                    {
+                        Handle = fun action ->
+                            try
+                                match UserSession.GetLoggedInUser () with
+                                    | None   -> basehome.Controller.Handle action
+                                    | Some _ -> Content.Redirect Action.Chatpage
+                            with :? NullReferenceException ->
+                                Content.Redirect Action.Chatpage
+                    }
+            }
+
         let authenticated = 
             let filter: Sitelet.Filter<Action> =
                 {
-                    VerifyUser = fun _ ->
-                                            true
+                    VerifyUser = fun _ -> true
                     LoginRedirect = fun _ -> Action.Loginpage
                 }
             Sitelet.Protect filter <| Sitelet.Content "/chat" Action.Chatpage ChatPage

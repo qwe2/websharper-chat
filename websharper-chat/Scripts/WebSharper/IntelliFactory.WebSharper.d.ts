@@ -1,28 +1,5 @@
 declare module IntelliFactory {
     module WebSharper {
-        module Char {
-            var GetNumericValue : {
-                (c: number): number;
-            };
-            var IsControl : {
-                (c: number): boolean;
-            };
-            var IsDigit : {
-                (c: number): boolean;
-            };
-            var IsLetter : {
-                (c: number): boolean;
-            };
-            var IsLetterOrDigit : {
-                (c: number): boolean;
-            };
-            var IsLower : {
-                (c: number): boolean;
-            };
-            var IsUpper : {
-                (c: number): boolean;
-            };
-        }
         module Arrays {
             var reverse : {
                 (array: __ABBREV.__WebSharper.ArrayProxy, offset: number, length: number): void;
@@ -311,6 +288,29 @@ declare module IntelliFactory {
                 <_M1, _M2, _M3>(arr1: _M1[], arr2: _M2[], arr3: _M3[]): any[];
             };
         }
+        module Char {
+            var GetNumericValue : {
+                (c: number): number;
+            };
+            var IsControl : {
+                (c: number): boolean;
+            };
+            var IsDigit : {
+                (c: number): boolean;
+            };
+            var IsLetter : {
+                (c: number): boolean;
+            };
+            var IsLetterOrDigit : {
+                (c: number): boolean;
+            };
+            var IsLower : {
+                (c: number): boolean;
+            };
+            var IsUpper : {
+                (c: number): boolean;
+            };
+        }
         module List {
             module T {
                 var Construct : {
@@ -534,11 +534,17 @@ declare module IntelliFactory {
             var compareArrays : {
                 (a: __ABBREV.__WebSharper.ObjectProxy[], b: __ABBREV.__WebSharper.ObjectProxy[]): number;
             };
+            var compareDates : {
+                (a: __ABBREV.__WebSharper.ObjectProxy, b: __ABBREV.__WebSharper.ObjectProxy): number;
+            };
             var Compare : {
                 <_M1>(a: _M1, b: _M1): number;
             };
             var arrayEquals : {
                 (a: __ABBREV.__WebSharper.ObjectProxy[], b: __ABBREV.__WebSharper.ObjectProxy[]): boolean;
+            };
+            var dateEquals : {
+                <_M1, _M2>(a: _M1, b: _M2): boolean;
             };
             var Equals : {
                 <_M1>(a: _M1, b: _M1): boolean;
@@ -1092,6 +1098,28 @@ declare module IntelliFactory {
                 <_M1>(x: __ABBREV.__WebSharper.LazyProxy<_M1>): _M1;
             };
         }
+        module ExtraTopLevelOperatorsProxy {
+            var array2D : {
+                <_M1, _M2>(rows: __ABBREV.__WebSharper.seq<_M1>): any;
+            };
+        }
+        module Util {
+            var observer : {
+                <_M1>(h: {
+                    (x: _M1): void;
+                }): any;
+            };
+            var addListener : {
+                <_M1>(event: any, h: {
+                    (x: _M1): void;
+                }): void;
+            };
+            var subscribeTo : {
+                <_M1>(event: any, h: {
+                    (x: _M1): void;
+                }): __ABBREV.__WebSharper.IDisposableProxy;
+            };
+        }
         module Arrays2D {
             var zeroCreate : {
                 <_M1>(n: number, m: number): any;
@@ -1155,28 +1183,6 @@ declare module IntelliFactory {
                 <_M1>(arr: __ABBREV.__WebSharper.ArrayProxy): number;
             };
         }
-        module ExtraTopLevelOperatorsProxy {
-            var array2D : {
-                <_M1, _M2>(rows: __ABBREV.__WebSharper.seq<_M1>): any;
-            };
-        }
-        module Util {
-            var observer : {
-                <_M1>(h: {
-                    (x: _M1): void;
-                }): any;
-            };
-            var addListener : {
-                <_M1>(event: any, h: {
-                    (x: _M1): void;
-                }): void;
-            };
-            var subscribeTo : {
-                <_M1>(event: any, h: {
-                    (x: _M1): void;
-                }): __ABBREV.__WebSharper.IDisposableProxy;
-            };
-        }
         module Pervasives {
             var NewFromList : {
                 <_M1>(fields: __ABBREV.__WebSharper.seq<any>): _M1;
@@ -1235,6 +1241,8 @@ declare module IntelliFactory {
             interface Kind {
             }
         }
+        interface ArrayProxy {
+        }
         interface AsyncProxy {
         }
         interface AsyncBuilderProxy {
@@ -1243,13 +1251,13 @@ declare module IntelliFactory {
         }
         interface ChoiceProxy11<_T1, _T2> {
         }
-        interface ChoiceProxy4<_T1, _T2, _T3> {
+        interface ChoiceProxy3<_T1, _T2, _T3> {
         }
         interface ChoiceProxy1<_T1, _T2, _T3, _T4> {
         }
         interface ChoiceProxy2<_T1, _T2, _T3, _T4, _T5> {
         }
-        interface ChoiceProxy3<_T1, _T2, _T3, _T4, _T5, _T6> {
+        interface ChoiceProxy4<_T1, _T2, _T3, _T4, _T5, _T6> {
         }
         interface ChoiceProxy<_T1, _T2, _T3, _T4, _T5, _T6, _T7> {
         }
@@ -1277,8 +1285,6 @@ declare module IntelliFactory {
             get_Current(): _T1;
         }
         interface Int32Proxy {
-        }
-        interface ArrayProxy {
         }
         interface KeyValuePairProxy<_T1, _T2> {
         }

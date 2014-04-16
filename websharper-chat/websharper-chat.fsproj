@@ -11,7 +11,7 @@
     <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
     <UseIISExpress>true</UseIISExpress>
-    <NuGetPackageImportStamp>5c01d703</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>e17b4f80</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -105,17 +105,9 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="..\packages\WebSharper.2.5.100.31\build\WebSharper.targets" Condition="Exists('..\packages\WebSharper.2.5.100.31\build\WebSharper.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\WebSharper.2.5.100.31\build\WebSharper.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WebSharper.2.5.100.31\build\WebSharper.targets'))" />
-  </Target>
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="SQLConnection.fs" />
-    <Compile Include="Remoting.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="ClAuth.fs" />
     <Content Include="Main.html" />
@@ -141,6 +133,10 @@
     </Reference>
     <Reference Include="FSharp.Data.TypeProviders">
       <HintPath>..\packages\FSharp.Data.TypeProviders.0.0.1\lib\net40\FSharp.Data.TypeProviders.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="IntelliFactory.WebSharper.Piglets">
+      <HintPath>..\packages\WebSharper.Piglets.0.1.74.133\lib\net40\IntelliFactory.WebSharper.Piglets.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WebSockets">
@@ -173,4 +169,11 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq.dll" />
   </ItemGroup>
+  <Import Project="..\packages\WebSharper.2.5.105.38\build\WebSharper.targets" Condition="Exists('..\packages\WebSharper.2.5.105.38\build\WebSharper.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\WebSharper.2.5.105.38\build\WebSharper.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WebSharper.2.5.105.38\build\WebSharper.targets'))" />
+  </Target>
 </Project>

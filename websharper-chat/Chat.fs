@@ -5,27 +5,38 @@ open System.Collections.Concurrent
 open System.Security
 open System.Text
 open System.Threading
+
 open System.Web
 open System.Net.WebSockets
 open Microsoft.Web.WebSockets
-open System.Web.Script.Serialization
+
 open IntelliFactory.WebSharper
 open IntelliFactory.WebSharper.Sitelets
+
+open System.Web.Security
+open System.Security.Principal
+
 
 module Chat =
     [<JavaScript>]
     type Message =
-        {
-            Username: string
-            Msg:      string
-        }
+        | Msg of string * string
+        | Error of string
 
     type User = 
         {
             Name: string
         }
+    
+    module private MessageEncoder =
+        module J = IntelliFactory.WebSharper.Core.Json
 
-    let private serializer = new JavaScriptSerializer()
+        let private jP = J.Provider.Create()
+        let private enc = jP.GetEncoder<Message>()
+        let ToJString (msg: Message) =
+            enc.Encode msg
+            |> jP.Pack
+            |> J.Stringify
 
     type WebSocketContainer() =
         inherit ConcurrentDictionary<string, User * WebSocketHandler option>()
@@ -35,7 +46,8 @@ module Chat =
                 let (_, wso) = elem.Value
                 match wso with
                     | Some ws ->
-                        serializer.Serialize({ Username = usr.Name; Msg = message })
+                        Msg (usr.Name, message)
+                        |> MessageEncoder.ToJString
                         |> ws.Send
                     | None -> ()
 
@@ -46,10 +58,12 @@ module Chat =
 
     let mutable clients = new WebSocketContainer()
 
-    let LoginUser (token: string) (username: string) =
-        UserSession.LoginUser token
-        System.Diagnostics.Debug.WriteLine token
-        clients.AddOrUpdate(token, ({ Name = username }, None), Utils.flip Utils.ct) |> ignore
+    let LoginUser (token: string) (username: string) (ws: WebSocketHandler option) =
+        clients.AddOrUpdate(token, ({ Name = username }, ws),
+            fun _ usr -> 
+                match usr with
+                | (u, _) -> ({u with Name = username}, ws))
+        |> ignore
 
     let LogoutUser =
         match UserSession.GetLoggedInUser () with
@@ -58,27 +72,43 @@ module Chat =
                     clients.TryRemove token |> ignore
             | None -> ()                                     
 
-    let AuthUser (ctx: WebSocketContext) =
-        let getUser () =
-            match ctx.User with
-            | null ->
+    let AuthUser(ctx: WebSocketContext) =
+        match ctx.CookieCollection.[FormsAuthentication.FormsCookieName] with
+        | null -> None
+        | cookie ->
+            let ticket = FormsAuthentication.Decrypt cookie.Value
+            let principal = GenericPrincipal(FormsIdentity(ticket), [||])
+            if principal.Identity.IsAuthenticated then
+                Some principal.Identity.Name
+            else 
                 None
-            | x ->
-                if x.Identity.IsAuthenticated then
-                    x.Identity.Name |> Some
-                else
-                    None
-        getUser ()
 
     type WebSocketChatHandler() =
         inherit WebSocketHandler()
 
-        override this.OnOpen() = ()
-            (*match AuthUser this.WebSocketContext match
-                | Some token -> *)
+        member this.SendError (msg: string) =
+            Error msg
+            |> MessageEncoder.ToJString
+            |> this.Send                        
+
+        member this.Auth (success: string -> unit, failmsg: string): unit =
+            match AuthUser this.WebSocketContext with
+                | None       -> this.SendError failmsg
+                | Some token -> success token
+
+        override this.OnOpen() =
+            let fn token = async {
+                                    let! uname = SQLConnection.GetUsernameByToken token
+                                    match uname with
+                                        | None      -> this.SendError "You are not logged in."
+                                        | Some user -> LoginUser token user (Some (this :> _))
+                                } |> Async.Start
+            this.Auth (fn, "You are not logged in")
 
         override this.OnMessage(message: string) =
-            ()            
+            let fn (token: string) = 
+                clients.Broadcast (token, message)
+            this.Auth (fn, "You are not logged in")
 
         override this.OnClose() = 
             ()
@@ -88,42 +118,4 @@ type ChatWebSocket() =
         member this.ProcessRequest context =
             if context.IsWebSocketRequest then
                 context.AcceptWebSocketRequest(new Chat.WebSocketChatHandler())
-        member this.IsReusable = true
-
-(*    
-
-    type Message =
-        {
-            Time: int
-            Sender: User
-            Text: String
-        }
-
-    module Auth =
-        type Key = class end
-
-        let Key = typeof<Key>.GUID.ToString()
-
-        type Token =
-            {
-                Name: String
-                Hash: String
-            }
-
-        let private sha256 = Cryptography.SHA256.Create()
-
-        let Generate (name: String): Token =
-            let hash = new StringBuilder()
-            sprintf "%s:%s" name Key
-            |> Encoding.Unicode.GetBytes
-            |> sha256.ComputeHash
-            |> Array.iter (fun by -> hash.Append(by.ToString("X2")) |> ignore)
-            {
-                Name = name
-                Hash = hash.ToString()
-            }
-
-        let Validate (token: Token): bool =
-            Generate token.Name = token
-            *)
-            
+        member this.IsReusable = true            
