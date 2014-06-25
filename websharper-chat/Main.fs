@@ -77,7 +77,7 @@ module Site =
             authenticated          
             Sitelet.Infer <| function
                 | Logout ->
-                    UserSession.Logout ()
+                    Chat.LogoutUser ()
                     Content.Redirect Action.Loginpage
                 | _ -> Content.ServerError
         ]

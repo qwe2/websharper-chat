@@ -1,6 +1,6 @@
 (function()
 {
- var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebSharper,Html,Default,List,WebsharperChat,ChatClient,WebSocket,window,EventsPervasives,Operators,Arrays,Strings,JSON,String,Piglets,Piglet1,ClAuth,Validation,Pervasives,Remoting,Controls,T;
+ var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebSharper,Html,Default,List,WebsharperChat,ChatClient,WebSocket,window,EventsPervasives,Operators,Arrays,Strings,JSON,String,Piglets,Piglet1,ClAuth,Pervasives,Remoting,Validation,Controls,T;
  Runtime.Define(Global,{
   WebsharperChat:{
    ChatClient:{
@@ -164,10 +164,7 @@
     },
     LoginPiglet:Runtime.Field(function()
     {
-     return Piglet1.WithSubmit(Validation.Is(function(x)
-     {
-      return x;
-     },"Invalid username or password",Pervasives.op_LessMultiplyGreater(Pervasives.op_LessMultiplyGreater(Piglet1.Return(function(x)
+     return Piglet1.WithSubmit(Pervasives.op_LessMultiplyGreater(Pervasives.op_LessMultiplyGreater(Piglet1.Return(function(x)
      {
       return function(y)
       {
@@ -179,7 +176,7 @@
      },"Enter Username",Piglet1.Yield(""))),Validation.Is(function(value)
      {
       return Validation.NotEmpty(value);
-     },"Enter password",Piglet1.Yield("")))));
+     },"Enter password",Piglet1.Yield(""))));
     }),
     RenderLoginForm:function(x,y,submit)
     {
@@ -258,9 +255,9 @@
   Piglets=Runtime.Safe(WebSharper.Piglets);
   Piglet1=Runtime.Safe(Piglets.Piglet1);
   ClAuth=Runtime.Safe(WebsharperChat.ClAuth);
-  Validation=Runtime.Safe(Piglet1.Validation);
   Pervasives=Runtime.Safe(Piglets.Pervasives);
   Remoting=Runtime.Safe(WebSharper.Remoting);
+  Validation=Runtime.Safe(Piglet1.Validation);
   Controls=Runtime.Safe(Piglets.Controls);
   return T=Runtime.Safe(List.T);
  });

@@ -23,14 +23,11 @@ module ClAuth =
     let Login (username: string) (password: string) =
         let resp = SQLConnection.Authenticate username password |> Async.RunSynchronously
         match resp with
-            | Some token -> UserSession.LoginUser token
-                            Chat.LoginUser token username None
-                            true
+            | Some token -> 
+                  UserSession.LoginUser token
+                  Chat.LoginUser token username None
+                  true
             | None -> false
-
-    [<Rpc>]
-    let Logout () =
-        UserSession.Logout ()
         
     [<JavaScript>]
     let LoginPiglet =
@@ -39,9 +36,7 @@ module ClAuth =
             |> Validation.Is Validation.NotEmpty "Enter Username")
         <*> (Piglet.Yield ""
             |> Validation.Is Validation.NotEmpty "Enter password")
-        |> Validation.Is id "Invalid username or password"
         |> Piglet.WithSubmit
-        
         
     [<JavaScript>]                                        
     let RenderLoginForm x y submit =
@@ -54,7 +49,6 @@ module ClAuth =
 
         let btn = Controls.Submit submit
         btn.AddClass("btn btn-primary")
-
                        
         JQuery.Of(pwi.Dom).Keyup(
             fun _ e -> 
@@ -78,73 +72,14 @@ module ClAuth =
             ]
             Div [] |> Controls.ShowErrors submit (fun errors ->
                                                     errors |> List.map (fun msg -> P [ Attr.Style "color: red" ] -< [ Text msg ]))
-
                                             
         ]
 
     [<JavaScript>]
     let LoginForm redirectUrl =
-        LoginPiglet         
+        LoginPiglet
         |> Piglet.Run (fun _ -> Redirect redirectUrl)                     
         |> Piglet.Render RenderLoginForm
-    
-
-    (*[<JavaScript>]
-    let WarningPanel label =
-        Formlet.Do {
-            let! _ =
-                Formlet.OfElement <| fun _ ->
-                    Div [Attr.Class "warningPanel"] -< [Text label]
-            return! Formlet.Never ()
-        }
-
-    [<JavaScript>]
-    let WithLoadingPane (a: Async<'T>) (f: 'T -> Formlet<'U>) : Formlet<'U> =
-        let loadingPane =
-            Formlet.BuildFormlet <| fun _ ->
-                let elem = 
-                    Div [Attr.Class "loadingPane"]
-                let state = new Event<Result<'T>>()
-                async {
-                    let! x = a
-                    do state.Trigger (Result.Success x)
-                    return ()
-                }
-                |> Async.Start
-                elem, ignore, state.Publish
-        Formlet.Replace loadingPane f
-
-    [<JavaScript>]
-    let LoginForm (redirectUrl: string) : Formlet<unit> =
-            let uName =
-                Controls.Input ""
-                |> Validator.IsNotEmpty "Enter Username"
-                |> Enhance.WithTextLabel "Username"
-                |> Enhance.WithCssClass "form-control"
-            let pw =
-                Controls.Password ""
-                |> Validator.IsNotEmpty "Enter Password"
-                |> Enhance.WithTextLabel "Password"
-                |> Enhance.WithCssClass "form-control"
-            let loginF =
-                Formlet.Yield (fun n pw -> (n, pw))
-                <*> uName <*> pw
- 
-            Formlet.Do {
-                let! (u, p) = 
-                    loginF
-                    |> Enhance.WithCustomSubmitAndResetButtons
-                        {Enhance.FormButtonConfiguration.Default with Label = Some "Login"; Class = Some "btn btn-primary"}
-                        {Enhance.FormButtonConfiguration.Default with Label = Some "Reset"; Class = Some "btn btn-default"}
-                return!
-                    WithLoadingPane (Login u p) <| fun loggedIn ->
-                        if loggedIn then
-                            Redirect redirectUrl
-                            Formlet.Return ()
-                        else
-                            WarningPanel "Login failed"
-            }
-            |> Enhance.WithFormContainer *)
             
 type LoginControl(redirectUrl: string) =
     inherit Web.Control()

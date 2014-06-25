@@ -43,4 +43,26 @@ module SQLConnection =
         Users.InsertOnSubmit(usr)
         Db.DataContext.SubmitChanges()
 
+    let UpdateToken (name : string) (token : string) =
+        query {
+            for user in Users do
+            where (user.Username = name)
+            select user
+        }            
+        |> Seq.iter (fun usr -> usr.Lasttoken <- token)
+
+        Db.DataContext.SubmitChanges()
+        
+
+    let GetUserByToken (token : string) =
+        try
+            let user = query {
+                for user in Users do
+                where (user.Lasttoken = token)
+                select user.Username
+                exactlyOne
+            }
+            Some (user, token)
+        with
+            | _ -> None
 

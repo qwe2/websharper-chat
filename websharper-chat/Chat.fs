@@ -71,10 +71,13 @@ module Chat =
                 | (u, _) -> ({u with Name = username}, ws))
         |> ignore
 
-    let LogoutUser =
+    let LogoutUser () =
         try
             match UserSession.GetLoggedInUser () with
                 | Some token ->
+                        match clients.TryGetValue token with
+                            | true, (u, _) -> clients.Broadcast(Userconnect(false, u.Name))
+                            | false, _ -> ()
                         UserSession.Logout ()
                         clients.TryRemove token |> ignore
                 | None -> ()
@@ -131,8 +134,9 @@ module Chat =
 
         override this.OnClose() = 
             let fn token =
-                let (u, _) = clients.[token]
-                clients.Broadcast(Userconnect(false, u.Name))
+                match clients.TryGetValue(token) with
+                    | true, (u, _) -> clients.Broadcast(Userconnect(false, u.Name))
+                    | false, _ -> ()
             this.Auth (fn, fun () -> ())
 
 type ChatWebSocket() = 

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "websharper-chat", "websharper-chat\websharper-chat.fsproj", "{B3E25E09-6E4F-4ED4-9B03-32E996E832A9}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WebSharperChat", "websharper-chat\WebSharperChat.fsproj", "{B3E25E09-6E4F-4ED4-9B03-32E996E832A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
