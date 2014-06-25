@@ -32,26 +32,9 @@ module SQLConnection =
 
             if usrs.Count() = 1 then
                 let token = Auth.GenToken username
-                for usr in usrs do
-                    usr.Lasttoken <- token
-                Db.DataContext.SubmitChanges()
                 return Some token
             else
                 return None
-        }
-                        
-    let GetUsernameByToken (token: string): Async<string option> =
-        async {
-            let usrs = query {
-                for user in Users do
-                where (user.Lasttoken = token)
-                select user.Username
-            }
-            let usrlist = [ for usr in usrs -> usr ]
-            match usrlist with
-                | []      -> return None
-                | x :: [] -> return Some x            
-                | _       -> return None
         }
 
     let AddUser (username: string) (password: string) =

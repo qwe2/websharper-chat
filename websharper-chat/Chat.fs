@@ -24,8 +24,10 @@ module Chat =
 
     [<JavaScript>]
     type Message =
-        | Msg of string * string
-        | Error of string
+        | Msg         of string * string
+        | Error       of string
+        | Userlist    of string array
+        | Userconnect of bool * string
 
     module private MessageEncoder =
         module J = IntelliFactory.WebSharper.Core.Json
@@ -40,6 +42,11 @@ module Chat =
     type WebSocketContainer() =
         inherit ConcurrentDictionary<string, User * WebSocketHandler option>()
         
+        member this.Broadcast(message: Message) =
+            for elem in this do
+                let (_, wso) = elem.Value
+                wso |> Option.iter (fun ws -> MessageEncoder.ToJString message |> ws.Send)                    
+
         member this.Broadcast(usr: User, message: string) =
             for elem in this do
                 let (_, wso) = elem.Value
@@ -72,9 +79,7 @@ module Chat =
                         clients.TryRemove token |> ignore
                 | None -> ()
 
-        with :? NullReferenceException -> ()
-        
-
+        with :? NullReferenceException -> ()       
 
     let AuthUser(ctx: WebSocketContext) =
         match ctx.CookieCollection.[FormsAuthentication.FormsCookieName] with
@@ -95,27 +100,40 @@ module Chat =
             |> MessageEncoder.ToJString
             |> this.Send                        
 
-        member this.Auth (success: string -> unit, failmsg: string): unit =
+        member this.Auth (success: string -> unit, fail: unit -> unit): unit =
             match AuthUser this.WebSocketContext with
-                | None       -> this.SendError failmsg
+                | None       -> fail ()
                 | Some token -> success token
 
         override this.OnOpen() =
-            let fn token = async {
-                                    let! uname = SQLConnection.GetUsernameByToken token
-                                    match uname with
-                                        | None      -> this.SendError "You are not logged in."
-                                        | Some user -> LoginUser token user (Some (this :> _))
-                                } |> Async.Start
-            this.Auth (fn, "You are not logged in")
+            let fn token = 
+                match clients.TryGetValue(token) with
+                    | (true, (user, _)) ->
+                        async {                                    
+                            clients.Broadcast(Userconnect(true, user.Name))
+                            LoginUser token user.Name (Some (this :> _))
+                            Array.ofSeq clients.Values
+                            |> Array.map (function
+                                            | u, _ -> u.Name)
+                            |> Userlist
+                            |> MessageEncoder.ToJString
+                            |> this.Send                                                       
+                        } |> Async.Start
+                    | (false, _) ->
+                        this.SendError "You are not logged in"
+                        
+            this.Auth (fn, fun () -> this.SendError "You are not logged in")
 
         override this.OnMessage(message: string) =
             let fn (token: string) = 
                 clients.Broadcast (token, message)
-            this.Auth (fn, "You are not logged in")
+            this.Auth (fn, fun () -> this.SendError "You are not logged in")
 
         override this.OnClose() = 
-            ()
+            let fn token =
+                let (u, _) = clients.[token]
+                clients.Broadcast(Userconnect(false, u.Name))
+            this.Auth (fn, fun () -> ())
 
 type ChatWebSocket() = 
     interface IHttpHandler with

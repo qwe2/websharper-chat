@@ -27,9 +27,11 @@ module ClAuth =
                             Chat.LoginUser token username None
                             true
             | None -> false
+
+    [<Rpc>]
+    let Logout () =
+        UserSession.Logout ()
         
-        
-  
     [<JavaScript>]
     let LoginPiglet =
         Piglet.Return (fun x y -> Login x y)
@@ -54,14 +56,13 @@ module ClAuth =
         btn.AddClass("btn btn-primary")
 
                        
-        JQuery.Of(IntelliFactory.WebSharper.Dom.Document.Current).Keypress(
+        JQuery.Of(pwi.Dom).Keyup(
             fun _ e -> 
-                if e.Which = 13 then 
+                if e.Which  = 13 then 
                     e.PreventDefault()
                     JQuery.Of(btn.Dom).Click() |> ignore
         ) |> ignore
                                     
-
         Div [ Attr.Class "form-horizontal container"; Attr.Style "margin-top: 2em; width: 50%; min-width: 200px" ] -<
         [
             Div [ Attr.Class "form-group" ] -< [

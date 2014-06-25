@@ -1,6 +1,6 @@
 (function()
 {
- var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebsharperChat,ChatClient,WebSocket,window,WebSharper,Html,Default,List,EventsPervasives,Operators,Strings,JSON,String,Piglets,Piglet1,ClAuth,Validation,Pervasives,Remoting,Controls,T;
+ var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebSharper,Html,Default,List,WebsharperChat,ChatClient,WebSocket,window,EventsPervasives,Operators,Arrays,Strings,JSON,String,Piglets,Piglet1,ClAuth,Validation,Pervasives,Remoting,Controls,T;
  Runtime.Define(Global,{
   WebsharperChat:{
    ChatClient:{
@@ -11,15 +11,59 @@
      jQuery(cb).scrollTop(jQuery(cb).height());
      return;
     },
+    AppendUser:function(name)
+    {
+     var n;
+     n=Default.LI(List.ofArray([Default.Text(name)]));
+     document.getElementById("usrli").appendChild(n.Body);
+     return;
+    },
     Connect:function(href)
     {
      return ChatClient.SetEventHandlers(new WebSocket(href));
     },
-    Main:function()
+    HandleMessage:function(_arg1)
+    {
+     var name,name1;
+     if(_arg1.$==0)
+      {
+       return ChatClient.Append(ChatClient.RenderMsg(_arg1.$0,_arg1.$1));
+      }
+     else
+      {
+       if(_arg1.$==2)
+        {
+         return ChatClient.ShowUserList(ChatClient.RenderUserlist(_arg1.$0));
+        }
+       else
+        {
+         if(_arg1.$==3)
+          {
+           if(_arg1.$0)
+            {
+             name=_arg1.$1;
+             ChatClient.Append(ChatClient.RenderInfo(name+" has connected"));
+             return ChatClient.AppendUser(name);
+            }
+           else
+            {
+             name1=_arg1.$1;
+             ChatClient.Append(ChatClient.RenderInfo(name1+" has disconnected"));
+             return ChatClient.RemoveUser(name1);
+            }
+          }
+         else
+          {
+           return ChatClient.Append(ChatClient.RenderError(_arg1.$0));
+          }
+        }
+      }
+    },
+    Main:function(logout)
     {
      var ws,textbox,arg00;
      ws=ChatClient.Connect("ws://"+window.location.host+"/chatsocket");
-     textbox=Default.Input(List.ofArray([Default.Text(""),Default.Attr().NewAttr("id","message-box"),Default.Attr().Class("form-control"),Default.Attr().NewAttr("type","text")]));
+     textbox=Default.Input(List.ofArray([Default.Text(""),Default.Attr().NewAttr("id","message-box"),Default.Attr().Class("form-control col-md-12"),Default.Attr().NewAttr("type","text")]));
      arg00=function()
      {
       return function(_char)
@@ -28,25 +72,37 @@
       };
      };
      EventsPervasives.Events().OnKeyPress(arg00,textbox);
-     return Operators.add(Default.Div(List.ofArray([Default.Attr().Class("container")])),List.ofArray([Default.Div(List.ofArray([Default.Attr().NewAttr("id","chatbox")])),textbox]));
+     return Operators.add(Default.Div(List.ofArray([Default.Attr().Class("container")])),List.ofArray([Default.A(List.ofArray([Default.Attr().NewAttr("href",logout),Default.Attr().Class("btn btn-primary"),Default.Text("Log out")])),Operators.add(Default.Div(List.ofArray([Default.Attr().Class("row styled_container")])),List.ofArray([Default.Div(List.ofArray([Default.Attr().NewAttr("id","chatbox"),Default.Attr().Class("col-md-10")])),Default.Div(List.ofArray([Default.Attr().NewAttr("id","userlist"),Default.Attr().Class("col-md-2")]))])),Operators.add(Default.Div(List.ofArray([Default.Attr().Class("row")])),List.ofArray([textbox]))]));
+    },
+    RemoveUser:function(name)
+    {
+     jQuery("#userli").each(function()
+     {
+      var n;
+      n=jQuery(this);
+      return n.text()===name?void n.remove():null;
+     });
     },
     RenderError:function(msg)
     {
      return Default.P(List.ofArray([Default.Text(msg),Default.Attr().Class("bg-danger")]));
     },
-    RenderMsg:function(data)
+    RenderInfo:function(msg)
     {
-     var msg,arg10;
-     if(data.$==0)
-      {
-       msg=data.$1;
-       arg10=List.ofArray([Default.Text(data.$0+": ")]);
-       return Operators.add(Default.P(List.ofArray([Default.Tags().NewTag("strong",arg10)])),List.ofArray([Default.Text(msg),Default.Attr().Class("bg-info")]));
-      }
-     else
-      {
-       return Default.P(List.ofArray([Default.Text(data.$0),Default.Attr().Class("bg-danger")]));
-      }
+     return Default.P(List.ofArray([Default.Text(msg),Default.Attr().Class("bg-warning")]));
+    },
+    RenderMsg:function(user,msg)
+    {
+     var arg10;
+     arg10=List.ofArray([Default.Text(user+": ")]);
+     return Operators.add(Default.P(List.ofArray([Default.Tags().NewTag("strong",arg10)])),List.ofArray([Default.Text(msg),Default.Attr().Class("bg-info")]));
+    },
+    RenderUserlist:function(lst)
+    {
+     return Operators.add(Default.UL(List.ofArray([Default.Attr().NewAttr("id","userli")])),Arrays.map(function(x)
+     {
+      return Default.LI(List.ofArray([Default.Text(x)]));
+     },lst));
     },
     SendText:function(ws,textbox)
     {
@@ -62,15 +118,32 @@
     {
      ws.onmessage=function(d)
      {
-      return ChatClient.Append(ChatClient.RenderMsg(JSON.parse(String(d.data))));
+      return ChatClient.HandleMessage(JSON.parse(String(d.data)));
      };
      ws.onerror=function()
      {
       return ChatClient.Append(ChatClient.RenderError("Something went wrong."));
      };
      return ws;
+    },
+    ShowUserList:function(lst)
+    {
+     var ul;
+     ul=jQuery("#userlist");
+     ul.children().each(function()
+     {
+      jQuery(this).remove();
+     });
+     ul.append(lst.Body);
+     return;
     }
    },
+   ChatControl:Runtime.Class({
+    get_Body:function()
+    {
+     return ChatClient.Main(this.logout);
+    }
+   }),
    ClAuth:{
     LoginForm:function(redirectUrl)
     {
@@ -130,7 +203,7 @@
      pwi["HtmlProvider@32"].SetAttribute(pwi.Body,"type","password");
      btn=Controls.Submit(submit);
      btn["HtmlProvider@32"].AddClass(btn.Body,"btn btn-primary");
-     jQuery(document).keypress(function(e)
+     jQuery(pwi.Body).keyup(function(e)
      {
       if(e.which===13)
        {
@@ -156,14 +229,6 @@
      })))]));
     }
    },
-   Controls:{
-    EntryPoint:Runtime.Class({
-     get_Body:function()
-     {
-      return ChatClient.Main();
-     }
-    })
-   },
    LoginControl:Runtime.Class({
     get_Body:function()
     {
@@ -176,16 +241,17 @@
  {
   document=Runtime.Safe(Global.document);
   jQuery=Runtime.Safe(Global.jQuery);
-  WebsharperChat=Runtime.Safe(Global.WebsharperChat);
-  ChatClient=Runtime.Safe(WebsharperChat.ChatClient);
-  WebSocket=Runtime.Safe(Global.WebSocket);
-  window=Runtime.Safe(Global.window);
   WebSharper=Runtime.Safe(Global.IntelliFactory.WebSharper);
   Html=Runtime.Safe(WebSharper.Html);
   Default=Runtime.Safe(Html.Default);
   List=Runtime.Safe(WebSharper.List);
+  WebsharperChat=Runtime.Safe(Global.WebsharperChat);
+  ChatClient=Runtime.Safe(WebsharperChat.ChatClient);
+  WebSocket=Runtime.Safe(Global.WebSocket);
+  window=Runtime.Safe(Global.window);
   EventsPervasives=Runtime.Safe(Html.EventsPervasives);
   Operators=Runtime.Safe(Html.Operators);
+  Arrays=Runtime.Safe(WebSharper.Arrays);
   Strings=Runtime.Safe(WebSharper.Strings);
   JSON=Runtime.Safe(Global.JSON);
   String=Runtime.Safe(Global.String);

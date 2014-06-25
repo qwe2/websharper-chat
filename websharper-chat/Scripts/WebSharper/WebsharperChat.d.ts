@@ -5,23 +5,33 @@ declare module WebsharperChat {
             Body: __ABBREV.__List.T<any>;
         }
     }
-    module Controls {
-        interface EntryPoint {
-            get_Body(): __ABBREV.__Html.IPagelet;
-        }
-    }
     module ChatClient {
-        interface Anim {
-            scrollTop: number;
-        }
-        var RenderMsg : {
-            (data: __ABBREV.__Chat.Message): __ABBREV.__Html.Element;
+        var Append : {
+            (elem: __ABBREV.__Html.Element): void;
+        };
+        var ShowUserList : {
+            (lst: __ABBREV.__Html.Element): void;
+        };
+        var AppendUser : {
+            (name: string): void;
+        };
+        var RemoveUser : {
+            (name: string): void;
         };
         var RenderError : {
             (msg: string): __ABBREV.__Html.Element;
         };
-        var Append : {
-            (elem: __ABBREV.__Html.Element): void;
+        var RenderMsg : {
+            (user: string, msg: string): __ABBREV.__Html.Element;
+        };
+        var RenderUserlist : {
+            (lst: string[]): __ABBREV.__Html.Element;
+        };
+        var RenderInfo : {
+            (msg: string): __ABBREV.__Html.Element;
+        };
+        var HandleMessage : {
+            (_arg1: __ABBREV.__Chat.Message): void;
         };
         var SetEventHandlers : {
             (ws: __ABBREV.__Html5.WebSocket): __ABBREV.__Html5.WebSocket;
@@ -33,7 +43,7 @@ declare module WebsharperChat {
             (ws: __ABBREV.__Html5.WebSocket, textbox: __ABBREV.__Html.Element): void;
         };
         var Main : {
-            (): __ABBREV.__Html.Element;
+            (logout: string): __ABBREV.__Html.Element;
         };
     }
     module Chat {
@@ -85,6 +95,9 @@ declare module WebsharperChat {
     interface ChatWebSocket {
     }
     interface LoginControl {
+        get_Body(): __ABBREV.__Html.IPagelet;
+    }
+    interface ChatControl {
         get_Body(): __ABBREV.__Html.IPagelet;
     }
     interface Action {

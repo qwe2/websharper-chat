@@ -8,16 +8,7 @@ open IntelliFactory.WebSharper.Sitelets
 type Action =
     | Loginpage
     | Chatpage
-
-module Controls =
-
-    [<Sealed>]
-    type EntryPoint() =
-        inherit Web.Control()
-
-        [<JavaScript>]
-        override __.Body =
-            ChatClient.Main() :> _
+    | Logout
 
 module Skin =
     open System.Web
@@ -45,7 +36,7 @@ module Site =
     let ChatPage =
         Skin.WithTemplate "Chat" <| fun ctx ->
                                         [
-                                            Div [new Controls.EntryPoint()]
+                                            Div [new ChatControl(ctx.Link <| Action.Logout)]
                                         ] 
 
     let LoginPage =
@@ -69,7 +60,7 @@ module Site =
                                     | None   -> basehome.Controller.Handle action
                                     | Some _ -> Content.Redirect Action.Chatpage
                             with :? NullReferenceException ->
-                                Content.Redirect Action.Chatpage
+                                Content.Redirect Action.Loginpage
                     }
             }
 
@@ -84,6 +75,11 @@ module Site =
         Sitelet.Sum [
             home
             authenticated          
+            Sitelet.Infer <| function
+                | Logout ->
+                    UserSession.Logout ()
+                    Content.Redirect Action.Loginpage
+                | _ -> Content.ServerError
         ]
 
 [<Sealed>]
