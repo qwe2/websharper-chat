@@ -172,3 +172,11 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+#packages
+packages/
+node_modules/
+
+websharper-chat/Content/
+websharper-chat/bin/
+

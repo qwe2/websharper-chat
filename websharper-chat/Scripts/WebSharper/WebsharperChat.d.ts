@@ -63,11 +63,11 @@ declare module WebsharperChat {
             (redirectUrl: string): __ABBREV.__Html.Element;
         };
         var LoginPiglet : {
-            (): __ABBREV.__Piglets.Piglet<boolean, {
+            (): __ABBREV.__Piglets.Piglet<any, {
                 (x: {
                     (x: __ABBREV.__Piglets.Stream<string>): {
                         (x: __ABBREV.__Piglets.Stream<string>): {
-                            (x: __ABBREV.__Piglets.Submitter<boolean>): __ABBREV.__Html.Element;
+                            (x: __ABBREV.__Piglets.Submitter<any>): __ABBREV.__Html.Element;
                         };
                     };
                 }): __ABBREV.__Html.Element;

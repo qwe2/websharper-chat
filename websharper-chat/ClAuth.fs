@@ -31,12 +31,14 @@ module ClAuth =
         
     [<JavaScript>]
     let LoginPiglet =
-        Piglet.Return (fun x y -> Login x y)
+        Piglet.Return (fun x y -> x, y)
         <*> (Piglet.Yield ""
             |> Validation.Is Validation.NotEmpty "Enter Username")
         <*> (Piglet.Yield ""
             |> Validation.Is Validation.NotEmpty "Enter password")
         |> Piglet.WithSubmit
+        |> Piglet.Validation.Is (function
+                                    | name, pw -> Login name pw) "Invalid username or password."
         
     [<JavaScript>]                                        
     let RenderLoginForm x y submit =
@@ -70,7 +72,7 @@ module ClAuth =
             Div [ Attr.Class "form-group" ] -< [
                 Div [ Attr.Class "col-sm-offset-2 col-sm-10" ] -< [ btn ]
             ]
-            Div [] |> Controls.ShowErrors submit (fun errors ->
+            Div [ Attr.Id "errors" ] |> Controls.ShowErrors submit (fun errors ->
                                                     errors |> List.map (fun msg -> P [ Attr.Style "color: red" ] -< [ Text msg ]))
                                             
         ]
@@ -78,7 +80,15 @@ module ClAuth =
     [<JavaScript>]
     let LoginForm redirectUrl =
         LoginPiglet
-        |> Piglet.Run (fun _ -> Redirect redirectUrl)                     
+//        |> Piglet.Run (function
+//                            | name, pw -> 
+//                                if Login name pw then                                    
+//                                    Redirect redirectUrl
+//                                else
+//                                    let msg =  P [ Attr.Style "color: red" ] -< [ Text "Invalid username or password!" ]
+//                                    ById("errors").AppendChild(msg.Dom) |> ignore
+//                      )
+        |> Piglet.Run (fun _ -> Redirect redirectUrl)
         |> Piglet.Render RenderLoginForm
             
 type LoginControl(redirectUrl: string) =

@@ -15,17 +15,18 @@ module ChatClient =
 
     let ShowUserList (lst: Element) =
         let ul = JQuery.Of("#userlist")
-        ul.Children().Each(fun a _ -> JQuery.Of(a).Remove() |> ignore) |> ignore
+        ul.Children().Each(fun (a : Dom.Element) _ -> JQuery.Of(a).Remove() |> ignore) |> ignore
         ul.Append(lst.Dom) |> ignore
 
     let AppendUser (name: string) =
         let n =  LI [ Text name ]
-        ById("usrli").AppendChild(n.Dom) |> ignore
+        ById("userli").AppendChild(n.Dom) |> ignore
 
     let RemoveUser (name: string) =
-        JQuery.Of("#userli").Each(fun a _ -> let n = JQuery.Of(a)
-                                             if n.Text() = name then
-                                                n.Remove() |> ignore
+        JQuery.Of("#userli").Children().Each(fun (a : Dom.Element) _ -> let n = JQuery.Of(a)
+                                                                        JavaScript.Log(n.Text())
+                                                                        if n.Text() = name then
+                                                                            n.Remove() |> ignore
                                              ) |> ignore        
 
     let RenderError (msg: string) =

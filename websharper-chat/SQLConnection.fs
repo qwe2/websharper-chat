@@ -18,6 +18,7 @@ module Auth =
 module SQLConnection =
     type internal DbSchema = SqlDataConnection<"Data Source=(localdb)\Projects;Initial Catalog=WebSharperChat;Integrated Security=True;\
                                                 Connect Timeout=30;Encrypt=False;TrustServerCertificate=False">
+
     let private Db = DbSchema.GetDataContext()
     let private Users = Db.Users    
 

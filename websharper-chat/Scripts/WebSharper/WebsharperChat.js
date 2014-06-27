@@ -1,6 +1,6 @@
 (function()
 {
- var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebSharper,Html,Default,List,WebsharperChat,ChatClient,WebSocket,window,EventsPervasives,Operators,Arrays,Strings,JSON,String,Piglets,Piglet1,ClAuth,Pervasives,Remoting,Validation,Controls,T;
+ var Global=this,Runtime=this.IntelliFactory.Runtime,document,jQuery,WebSharper,Html,Default,List,WebsharperChat,ChatClient,WebSocket,window,EventsPervasives,Operators,JavaScript,Arrays,Strings,JSON,String,ClAuth,Piglets,Piglet1,Pervasives,Validation,Remoting,Controls;
  Runtime.Define(Global,{
   WebsharperChat:{
    ChatClient:{
@@ -15,7 +15,7 @@
     {
      var n;
      n=Default.LI(List.ofArray([Default.Text(name)]));
-     document.getElementById("usrli").appendChild(n.Body);
+     document.getElementById("userli").appendChild(n.Body);
      return;
     },
     Connect:function(href)
@@ -76,10 +76,11 @@
     },
     RemoveUser:function(name)
     {
-     jQuery("#userli").each(function()
+     jQuery("#userli").children().each(function()
      {
       var n;
       n=jQuery(this);
+      JavaScript.Log(n.text());
       return n.text()===name?void n.remove():null;
      });
     },
@@ -147,6 +148,8 @@
    ClAuth:{
     LoginForm:function(redirectUrl)
     {
+     var _arg10_;
+     _arg10_=ClAuth.LoginPiglet();
      return Piglet1.Render(function(x)
      {
       return function(y)
@@ -156,19 +159,20 @@
         return ClAuth.RenderLoginForm(x,y,submit);
        };
       };
-     },Piglet1.Run(function()
+     },Piglet1.Run(Runtime.Tupled(function()
      {
       window.location=redirectUrl;
       return redirectUrl;
-     },ClAuth.LoginPiglet()));
+     }),_arg10_));
     },
     LoginPiglet:Runtime.Field(function()
     {
-     return Piglet1.WithSubmit(Pervasives.op_LessMultiplyGreater(Pervasives.op_LessMultiplyGreater(Piglet1.Return(function(x)
+     var _arg20_;
+     _arg20_=Piglet1.WithSubmit(Pervasives.op_LessMultiplyGreater(Pervasives.op_LessMultiplyGreater(Piglet1.Return(function(x)
      {
       return function(y)
       {
-       return Remoting.Call("WebsharperChat:0",[x,y]);
+       return[x,y];
       };
      }),Validation.Is(function(value)
      {
@@ -177,6 +181,10 @@
      {
       return Validation.NotEmpty(value);
      },"Enter password",Piglet1.Yield(""))));
+     return Validation.Is(Runtime.Tupled(function(_arg1)
+     {
+      return Remoting.Call("WebsharperChat:0",[_arg1[0],_arg1[1]]);
+     }),"Invalid username or password.",_arg20_);
     }),
     RenderLoginForm:function(x,y,submit)
     {
@@ -221,9 +229,7 @@
       {
        return Operators.add(Default.P(List.ofArray([Default.Attr().NewAttr("style","color: red")])),List.ofArray([Default.Text(msg)]));
       },errors);
-     },Default.Div(Runtime.New(T,{
-      $:0
-     })))]));
+     },Default.Div(List.ofArray([Default.Attr().NewAttr("id","errors")])))]));
     }
    },
    LoginControl:Runtime.Class({
@@ -248,18 +254,18 @@
   window=Runtime.Safe(Global.window);
   EventsPervasives=Runtime.Safe(Html.EventsPervasives);
   Operators=Runtime.Safe(Html.Operators);
+  JavaScript=Runtime.Safe(WebSharper.JavaScript);
   Arrays=Runtime.Safe(WebSharper.Arrays);
   Strings=Runtime.Safe(WebSharper.Strings);
   JSON=Runtime.Safe(Global.JSON);
   String=Runtime.Safe(Global.String);
+  ClAuth=Runtime.Safe(WebsharperChat.ClAuth);
   Piglets=Runtime.Safe(WebSharper.Piglets);
   Piglet1=Runtime.Safe(Piglets.Piglet1);
-  ClAuth=Runtime.Safe(WebsharperChat.ClAuth);
   Pervasives=Runtime.Safe(Piglets.Pervasives);
-  Remoting=Runtime.Safe(WebSharper.Remoting);
   Validation=Runtime.Safe(Piglet1.Validation);
-  Controls=Runtime.Safe(Piglets.Controls);
-  return T=Runtime.Safe(List.T);
+  Remoting=Runtime.Safe(WebSharper.Remoting);
+  return Controls=Runtime.Safe(Piglets.Controls);
  });
  Runtime.OnLoad(function()
  {
